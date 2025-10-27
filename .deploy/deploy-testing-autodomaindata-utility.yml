@@ -42,7 +42,7 @@ variables:
   patch: $[counter(variables['revisionCounterBase'], 1)]
   projectName: 'SurianMing.Utilities.Testing.AutoDomainData'
 
-name: $(Build.DefinitionName)__$(buildReason)_$(revision)
+name: $(Build.DefinitionName)__$(buildReason)_$(patch)
 
 pool:
   vmImage: ubuntu-latest
@@ -92,9 +92,9 @@ stages:
         arguments: '--configuration $(buildConfiguration)'
         nobuild: true
         versioningScheme: 'byPrereleaseNumber'
-        majorVersion: '$(major)'
-        minorVersion: '$(minor)'
-        patchVersion: '$(patch)'
+        majorVersion: ${{ parameters.major }}
+        minorVersion: ${{ parameters.minor }}
+        patchVersion: $(patch)
         includesymbols: true
         includesource: true
 
