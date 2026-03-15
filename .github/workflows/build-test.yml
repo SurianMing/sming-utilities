@@ -29,7 +29,7 @@ jobs:
       env:
         NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Repoint utility references to latest nuget package version
-      run: sed -i -E 's/ProjectReference Include="\.\.\\(SurianMing\.Utilities\..*)\\.*)\\.*/PackageReference Include="\1" Version="${{ inputs.version-no }}" \/>/g' "${{ inputs.project-name }}/${{ inputs.project-name }}.csproj"
+      run: sed -i -E 's/ProjectReference Include="\.\.\\(SurianMing\.Utilities\..*)\\.*/PackageReference Include="\1" Version="${{ inputs.version-no }}" \/>/g' "${{ inputs.project-name }}/${{ inputs.project-name }}.csproj"
     - name: Restore dependencies
       run: dotnet restore "${{ inputs.project-name }}/${{ inputs.project-name }}.csproj"
     - name: Build
