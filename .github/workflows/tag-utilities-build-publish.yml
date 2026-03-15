@@ -1,0 +1,34 @@
+name: Build and Publish Utilities
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  get-version-no:
+    uses: ./.github/workflows/get-version-no.yml
+  build-test-publish-0:
+    name: Process utilities set 0
+    strategy:
+      fail-fast: true
+      matrix:
+        utility-project-name:
+          - SurianMing.Utilities.Data
+          - SurianMing.Utilities.Testing.AutoDomainData
+    needs: get-version-no
+    uses: ./.github/workflows/build-test.yml
+    with:
+      project-name: '${{ matrix.utility-project-name }}'
+      version-no: ${{ needs.get-version-no.outputs.next-version }}
+  create-release:
+    name: Create release
+    needs: [ build-test-publish-0, get-version-no ]
+    uses: ./.github/workflows/add-github-release.yml
+    with:
+      version-number: ${{ needs.get-version-no.outputs.next-version }}
+      previous-tag: ${{ needs.get-version-no.outputs.last-version-tag }}

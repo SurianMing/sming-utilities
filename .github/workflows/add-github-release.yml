@@ -1,0 +1,25 @@
+name: Add Github Release
+
+on:
+  workflow_call:
+    inputs:
+      version-number:
+        description: The version number to associate with the release - a tag will be added with v{}
+        type: string
+        required: true
+      previous-tag:
+        description: Teh tag associated with the previous release
+        type: string
+        required: true
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  create-release:
+    name: Create release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Run create script
+        run: gh release create v${{ inputs.version-number }} --generate-notes --notes-start-tag ${{ inputs.previous-tag }} -t "Utilities v${{ inputs.version-number }}"
