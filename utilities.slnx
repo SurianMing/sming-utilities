@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SurianMing.Utilities.Data/SurianMing.Utilities.Data.csproj" />
+  <Project Path="SurianMing.Utilities.Testing.AutoDomainData/SurianMing.Utilities.Testing.AutoDomainData.csproj" />
+</Solution>
