@@ -1,0 +1,35 @@
+name: Get Version number
+
+on:
+  workflow_call:
+    outputs:
+      last-version-tag:
+        description: The tag for the previous release
+        value: ${{ jobs.get-version-no.outputs.previousTag }}
+      next-version:
+        description: The version number to use for this build
+        value: ${{ jobs.get-version-no.outputs.nextVersionNo }}
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  Major_Version: 1
+  Minor_Version: 0
+
+jobs:
+  get-version-no:
+    name: Get version number
+    runs-on: ubuntu-latest
+    outputs:
+      nextVersionNo: ${{ steps.currentVersion.outputs.NEXT_VERSION }}
+      previousTag: ${{ steps.currentVersion.outputs.PREVIOUS_TAG }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: currentVersion
+        run: |
+          latestReleaseTag="$(gh release list -L 1 --json tagName -q .[0].tagName)"
+          latestReleaseTagVersionRoot=$(echo $latestReleaseTag | awk -F'.' '{ OFS="."; print $1, $2 "." }')
+          latestReleaseTagBuild=$(echo $latestReleaseTag | awk -F'.' '{ print $3 }')
+          newReleaseVersionRoot="v$Major_Version.$Minor_Version."
+          newReleaseVersionTag=$([ "$latestReleaseTagVersionRoot" = "$newReleaseVersionRoot" ] && echo "$newReleaseVersionRoot$((latestReleaseTagBuild+1))" || echo "$newReleaseVersionRoot""0" )
+          echo "PREVIOUS_TAG=$latestReleaseTag" >> $GITHUB_OUTPUT
+          echo "NEXT_VERSION=${newReleaseVersionTag:1}" >> $GITHUB_OUTPUT

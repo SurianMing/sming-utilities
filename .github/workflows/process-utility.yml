@@ -1,0 +1,23 @@
+name: Process Utility
+
+on:
+  workflow_call:
+    inputs:
+      project-name:
+        type: string
+        required: true
+      version-no:
+        type: string
+        required: false
+      deploy:
+        type: boolean
+        required: true
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-test.yml
+    with:
+      project-name:
