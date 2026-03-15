@@ -35,6 +35,6 @@ jobs:
     - name: Build
       run: dotnet build "${{ inputs.project-name }}/${{ inputs.project-name }}.csproj" --configuration Release --no-restore
     - name: Pack
-      run: dotnet pack "${{ inputs.project-name }}/${{ inputs.project-name }}.csproj" --no-build -p:PackageVersion=${{ inputs.version-no }}
+      run: dotnet pack "${{ inputs.project-name }}/${{ inputs.project-name }}.csproj" --no-build -o "${{ inputs.project-name }}/nuget" -p:PackageVersion=${{ inputs.version-no }}
     - name: Publish to GPR
-      run: dotnet nuget push *.nupkg
+      run: dotnet nuget push ${{ inputs.project-name }}/nuget/*.nupkg
