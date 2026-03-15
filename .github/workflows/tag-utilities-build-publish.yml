@@ -21,7 +21,7 @@ jobs:
           - SurianMing.Utilities.Data
           - SurianMing.Utilities.Testing.AutoDomainData
     needs: get-version-no
-    uses: ./.github/workflows/process-utility.yml
+    uses: ./.github/workflows/build-test.yml
     with:
       project-name: '${{ matrix.utility-project-name }}'
       version-no: ${{ needs.get-version-no.outputs.next-version }}
