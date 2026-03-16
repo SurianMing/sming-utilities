@@ -12,29 +12,49 @@ on:
         required: true
         type: string
 
-env:
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 jobs:
   build:
     name: Build, pack and publish utility
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
-    - name: Setup .Net
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 10.0.x
-        source-url: https://nuget.pkg.github.com/SurianMing/index.json
-      env:
-        NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Repoint utility references to latest nuget package version
-      run: sed -i -E 's/ProjectReference Include="\.\.\\(SurianMing\.Utilities\..*)\\.*/PackageReference Include="\1" Version="${{ inputs.version-no }}" \/>/g' "${{ inputs.project-name }}/${{ inputs.project-name }}.csproj"
-    - name: Restore dependencies
-      run: dotnet restore "${{ inputs.project-name }}/${{ inputs.project-name }}.csproj"
-    - name: Build
-      run: dotnet build "${{ inputs.project-name }}/${{ inputs.project-name }}.csproj" --configuration Release --no-restore
-    - name: Pack
-      run: dotnet pack "${{ inputs.project-name }}/${{ inputs.project-name }}.csproj" --no-build -o "${{ inputs.project-name }}/nuget" -p:PackageVersion=${{ inputs.version-no }}
-    - name: Publish to GPR
-      run: dotnet nuget push ${{ inputs.project-name }}/nuget/*.nupkg
+      - uses: actions/checkout@v5
+      - name: Setup .Net
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+          source-url: https://nuget.pkg.github.com/SurianMing/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Repoint utility references to latest nuget package version
+        run: sed -i -E 's/ProjectReference Include="\.\.\\(SurianMing\.Utilities\..*)\\.*/PackageReference Include="\1" Version="${{ inputs.version-no }}" \/>/g' "${{ inputs.project-name }}/${{ inputs.project-name }}.csproj"
+      - name: Restore dependencies
+        run: dotnet restore "${{ inputs.project-name }}/${{ inputs.project-name }}.csproj"
+      - name: Build
+        run: dotnet build "${{ inputs.project-name }}/${{ inputs.project-name }}.csproj" --configuration Release --no-restore
+      - name: Pack
+        run: dotnet pack "${{ inputs.project-name }}/${{ inputs.project-name }}.csproj" --no-build -o "${{ inputs.project-name }}/nuget" -p:PackageVersion=${{ inputs.version-no }}
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v5
+        with:
+          name: ${{ inputs.project-name }}-artifacts
+          path: ${{ inputs.project-name }}/nuget/*.nupkg
+          retention-days: 5
+
+  deployment:
+    name: Push nuget package to nuget registry.
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+          source-url: https://nuget.pkg.github.com/SurianMing/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download build artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: ${{ inputs.project-name }}-artifacts
+      - name: Publish to GPR
+        run: dotnet nuget push *.nupkg
