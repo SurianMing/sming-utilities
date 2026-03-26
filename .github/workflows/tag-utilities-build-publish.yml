@@ -18,9 +18,23 @@ jobs:
       fail-fast: true
       matrix:
         utility-project-name:
-          - SurianMing.Utilities.Data
+          - SurianMing.Utilities.DelegateInvokers
+          - SurianMing.Utilities.ApplicationSettings
           - SurianMing.Utilities.Testing.AutoDomainData
     needs: get-version-no
+    uses: ./.github/workflows/build-test.yml
+    with:
+      project-name: '${{ matrix.utility-project-name }}'
+      version-no: ${{ needs.get-version-no.outputs.next-version }}
+  build-test-publish-1:
+    name: Process utilities set 1
+    strategy:
+      fail-fast: true
+      matrix:
+        utility-project-name:
+          - SurianMing.Utilities.Data
+          - SurianMing.Utilities.Kafka
+    needs: [ get-version-no, build-test-publish-0 ]
     uses: ./.github/workflows/build-test.yml
     with:
       project-name: '${{ matrix.utility-project-name }}'

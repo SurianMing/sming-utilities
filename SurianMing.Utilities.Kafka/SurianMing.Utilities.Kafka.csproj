@@ -7,12 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Identity" Version="1.19.0" />
-    <PackageReference Include="Dapper" Version="2.1.72" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.5" />
+    <PackageReference Include="Confluent.Kafka" Version="2.13.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.5" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SurianMing.Utilities.ApplicationSettings\SurianMing.Utilities.ApplicationSettings.csproj" />
+    <ProjectReference Include="..\SurianMing.Utilities.DelegateInvokers\SurianMing.Utilities.DelegateInvokers.csproj" />
   </ItemGroup>
 
   <ItemGroup>
