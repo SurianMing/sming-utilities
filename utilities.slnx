@@ -1,4 +1,9 @@
 <Solution>
+  <Project Path="SurianMing.Utilities.ApplicationSettings/SurianMing.Utilities.ApplicationSettings.csproj" />
   <Project Path="SurianMing.Utilities.Data/SurianMing.Utilities.Data.csproj" />
+  <Project Path="SurianMing.Utilities.DelegateInvokers.Tests/SurianMing.Utilities.DelegateInvokers.Tests.csproj" />
+  <Project Path="SurianMing.Utilities.DelegateInvokers/SurianMing.Utilities.DelegateInvokers.csproj" />
+  <Project Path="SurianMing.Utilities.Kafka.Tests/SurianMing.Utilities.Kafka.Tests.csproj" />
+  <Project Path="SurianMing.Utilities.Kafka/SurianMing.Utilities.Kafka.csproj" />
   <Project Path="SurianMing.Utilities.Testing.AutoDomainData/SurianMing.Utilities.Testing.AutoDomainData.csproj" />
 </Solution>
