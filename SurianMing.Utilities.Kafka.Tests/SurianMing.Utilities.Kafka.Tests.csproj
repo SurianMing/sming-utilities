@@ -6,7 +6,6 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>SurianMing.Utilities.Kafka.Tests</RootNamespace>
     <TargetFramework>net10.0</TargetFramework>
-    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,8 +20,8 @@
     <PackageReference Include="xunit.v3.mtp-v2" Version="3.2.2" />
   </ItemGroup>
 
-  <!-- <ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\SurianMing.Utilities.Kafka\SurianMing.Utilities.Kafka.csproj" />
-  </ItemGroup> -->
+  </ItemGroup>
 
 </Project>
