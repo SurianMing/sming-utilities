@@ -34,7 +34,7 @@ jobs:
         utility-project-name:
           - SurianMing.Utilities.Data
           - SurianMing.Utilities.Kafka
-    needs: get-version-no
+    needs: [ get-version-no, build-test-publish-0 ]
     uses: ./.github/workflows/build-test.yml
     with:
       project-name: '${{ matrix.utility-project-name }}'
