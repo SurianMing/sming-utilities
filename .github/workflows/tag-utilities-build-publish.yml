@@ -34,6 +34,7 @@ jobs:
         utility-project-name:
           - SurianMing.Utilities.Data
           - SurianMing.Utilities.Kafka
+          - SurianMing.Utilities.MinimalApi
     needs: [ get-version-no, build-test-publish-0 ]
     uses: ./.github/workflows/build-test.yml
     with:
