@@ -18,9 +18,9 @@ jobs:
       fail-fast: true
       matrix:
         utility-project-name:
-          - SurianMing.Utilities.DelegateInvokers
-          - SurianMing.Utilities.ApplicationSettings
-          - SurianMing.Utilities.Testing.AutoDomainData
+          - SmingCode.Utilities.DelegateInvokers
+          - SmingCode.Utilities.ApplicationSettings
+          - SmingCode.Utilities.Testing.AutoDomainData
     needs: get-version-no
     uses: ./.github/workflows/build-test.yml
     with:
@@ -32,9 +32,9 @@ jobs:
       fail-fast: true
       matrix:
         utility-project-name:
-          - SurianMing.Utilities.Data
-          - SurianMing.Utilities.Kafka
-          - SurianMing.Utilities.MinimalApi
+          - SmingCode.Utilities.Data
+          - SmingCode.Utilities.Kafka
+          - SmingCode.Utilities.MinimalApi
     needs: [ get-version-no, build-test-publish-0 ]
     uses: ./.github/workflows/build-test.yml
     with:
@@ -46,7 +46,7 @@ jobs:
       fail-fast: true
       matrix:
         utility-project-name:
-          - SurianMing.Utilities.Kafka.MinimalConsumers
+          - SmingCode.Utilities.Kafka.MinimalConsumers
     needs: [ get-version-no, build-test-publish-1 ]
     uses: ./.github/workflows/build-test.yml
     with:

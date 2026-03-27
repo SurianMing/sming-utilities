@@ -9,9 +9,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "Build_Command_Line_Builder",
-            "program": "${workspaceFolder}/SurianMing.Utilities.CommandLineBuilder/SurianMing.Utilities.CommandLineBuilder.csproj",
+            "program": "${workspaceFolder}/SmingCode.Utilities.CommandLineBuilder/SmingCode.Utilities.CommandLineBuilder.csproj",
             "args": [],
-            "cwd": "${workspaceFolder}/SurianMing.Utilities.Mqtt.Runner",
+            "cwd": "${workspaceFolder}/SmingCode.Utilities.Mqtt.Runner",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",
             "stopAtEntry": false

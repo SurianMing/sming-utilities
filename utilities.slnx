@@ -1,12 +1,12 @@
 <Solution>
-  <Project Path="SurianMing.Utilities.ApplicationSettings/SurianMing.Utilities.ApplicationSettings.csproj" />
-  <Project Path="SurianMing.Utilities.Data/SurianMing.Utilities.Data.csproj" />
-  <Project Path="SurianMing.Utilities.DelegateInvokers.Tests/SurianMing.Utilities.DelegateInvokers.Tests.csproj" />
-  <Project Path="SurianMing.Utilities.DelegateInvokers/SurianMing.Utilities.DelegateInvokers.csproj" />
-  <Project Path="SurianMing.Utilities.Kafka.MinimalConsumers.Tests/SurianMing.Utilities.Kafka.MinimalConsumers.Tests.csproj" />
-  <Project Path="SurianMing.Utilities.Kafka.MinimalConsumers/SurianMing.Utilities.Kafka.MinimalConsumers.csproj" />
-  <Project Path="SurianMing.Utilities.Kafka.Tests/SurianMing.Utilities.Kafka.Tests.csproj" />
-  <Project Path="SurianMing.Utilities.Kafka/SurianMing.Utilities.Kafka.csproj" />
-  <Project Path="SurianMing.Utilities.MinimalApi/SurianMing.Utilities.MinimalApi.csproj" />
-  <Project Path="SurianMing.Utilities.Testing.AutoDomainData/SurianMing.Utilities.Testing.AutoDomainData.csproj" />
+  <Project Path="SmingCode.Utilities.ApplicationSettings/SmingCode.Utilities.ApplicationSettings.csproj" />
+  <Project Path="SmingCode.Utilities.Data/SmingCode.Utilities.Data.csproj" />
+  <Project Path="SmingCode.Utilities.DelegateInvokers.Tests/SmingCode.Utilities.DelegateInvokers.Tests.csproj" />
+  <Project Path="SmingCode.Utilities.DelegateInvokers/SmingCode.Utilities.DelegateInvokers.csproj" />
+  <Project Path="SmingCode.Utilities.Kafka.MinimalConsumers.Tests/SmingCode.Utilities.Kafka.MinimalConsumers.Tests.csproj" />
+  <Project Path="SmingCode.Utilities.Kafka.MinimalConsumers/SmingCode.Utilities.Kafka.MinimalConsumers.csproj" />
+  <Project Path="SmingCode.Utilities.Kafka.Tests/SmingCode.Utilities.Kafka.Tests.csproj" />
+  <Project Path="SmingCode.Utilities.Kafka/SmingCode.Utilities.Kafka.csproj" />
+  <Project Path="SmingCode.Utilities.MinimalApi/SmingCode.Utilities.MinimalApi.csproj" />
+  <Project Path="SmingCode.Utilities.Testing.AutoDomainData/SmingCode.Utilities.Testing.AutoDomainData.csproj" />
 </Solution>
