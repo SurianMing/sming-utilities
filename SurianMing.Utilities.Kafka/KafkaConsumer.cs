@@ -3,13 +3,15 @@ using ApplicationSettings;
 
 internal class KafkaConsumer<TKey, TValue>(
     IServiceScopeFactory _serviceScopeFactory,
-    KafkaConsumerDefinition<TKey, TValue> _kafkaConsumerDefinition,
     ITopicManager _topicManager,
-    SmingApplicationSettings _smingApplicationSettings,
+    KafkaConsumerDefinition<TKey, TValue> _kafkaConsumerDefinition,
+    IOptions<SmingApplicationSettings> smingApplicationSettingsOptions,
     KafkaServerOptions _kafkaServerOptions,
-    ILogger _logger
+    ILogger<KafkaConsumer<TKey, TValue>> _logger
 ) : IKafkaConsumer
 {
+    private SmingApplicationSettings _smingApplicationSettings = smingApplicationSettingsOptions.Value;
+
     public void InitialiseEventConsumer(
         CancellationToken cancellationToken
     )
