@@ -1,11 +1,10 @@
-using System.Reflection;
 using Microsoft.Extensions.Hosting;
-using SurianMing.Utilities.ApplicationSettings;
 
 namespace SurianMing.Utilities.Kafka;
 
 internal class KafkaApplication(
     IEnumerable<IKafkaConsumerDefinition> kafkaConsumerDefinitions,
+    KafkaServerOptions _kafkaServerOptions,
     IServiceProvider serviceProvider,
     ILogger<KafkaApplication> _logger
 ) : BackgroundService
@@ -26,15 +25,16 @@ internal class KafkaApplication(
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _kafkaConsumers.ForEach(consumer => consumer.InitialiseEventConsumer(stoppingToken));
+        var livenessLogInterval = _kafkaServerOptions.LivenessLogIntervalSeconds * 1000;
 
         while (!stoppingToken.IsCancellationRequested)
         {
             if (_logger.IsEnabled(LogLevel.Information))
             {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                _logger.LogInformation("Kafka consumers running at: {time}", DateTimeOffset.Now);
             }
 
-            await Task.Delay(1000, stoppingToken);
+            await Task.Delay(livenessLogInterval, stoppingToken);
         }
     }
 }
