@@ -3,6 +3,8 @@
   <Project Path="SurianMing.Utilities.Data/SurianMing.Utilities.Data.csproj" />
   <Project Path="SurianMing.Utilities.DelegateInvokers.Tests/SurianMing.Utilities.DelegateInvokers.Tests.csproj" />
   <Project Path="SurianMing.Utilities.DelegateInvokers/SurianMing.Utilities.DelegateInvokers.csproj" />
+  <Project Path="SurianMing.Utilities.Kafka.MinimalConsumers.Tests/SurianMing.Utilities.Kafka.MinimalConsumers.Tests.csproj" />
+  <Project Path="SurianMing.Utilities.Kafka.MinimalConsumers/SurianMing.Utilities.Kafka.MinimalConsumers.csproj" />
   <Project Path="SurianMing.Utilities.Kafka.Tests/SurianMing.Utilities.Kafka.Tests.csproj" />
   <Project Path="SurianMing.Utilities.Kafka/SurianMing.Utilities.Kafka.csproj" />
   <Project Path="SurianMing.Utilities.MinimalApi/SurianMing.Utilities.MinimalApi.csproj" />

@@ -5,12 +5,8 @@ using SurianMing.Utilities.ApplicationSettings;
 namespace SurianMing.Utilities.Kafka;
 
 internal class KafkaApplication(
-    IServiceScopeFactory serviceScopeFactory,
-    ITopicManager topicManager,
-    IOptions<SmingApplicationSettings> smingApplicationSettingsOptions,
     IEnumerable<IKafkaConsumerDefinition> kafkaConsumerDefinitions,
-    KafkaServerOptions serverOptions,
-    ILoggerFactory loggerFactory,
+    IServiceProvider serviceProvider,
     ILogger<KafkaApplication> _logger
 ) : BackgroundService
 {
@@ -20,17 +16,11 @@ internal class KafkaApplication(
             var consumerType = typeof(KafkaConsumer<,>)
                 .MakeGenericType(definition.GetType().GetGenericArguments());
 
-            return (IKafkaConsumer)Activator.CreateInstance(
+            return (IKafkaConsumer)ActivatorUtilities.CreateInstance(
+                serviceProvider,
                 consumerType,
-                [
-                    serviceScopeFactory,
-                    definition,
-                    topicManager,
-                    smingApplicationSettingsOptions.Value,
-                    serverOptions,
-                    loggerFactory.CreateLogger(consumerType)
-                ]
-            )!;
+                [ definition ]
+            );
         })];
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

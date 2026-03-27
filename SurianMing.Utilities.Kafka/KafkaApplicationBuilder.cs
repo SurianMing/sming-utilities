@@ -52,7 +52,7 @@ public class KafkaApplicationBuilder : IHostApplicationBuilder
         return _hostApplicationBuilder.Build();
     }
 
-    public IKafkaConsumerDefinition MapEventHandler(
+    public IKafkaConsumerDefinition MapConsumer(
         string topicToMatch,
         Delegate handler
     )
