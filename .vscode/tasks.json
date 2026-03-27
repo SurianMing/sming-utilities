@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/SurianMing.Utilities.CommandLineBuilder/SurianMing.Utilities.CommandLineBuilder.csproj",
+                "${workspaceFolder}/SmingCode.Utilities.CommandLineBuilder/SmingCode.Utilities.CommandLineBuilder.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/SurianMing.Utilities.Mqtt.Runner/SurianMing.Utilities.Mqtt.Runner.csproj",
+                "${workspaceFolder}/SmingCode.Utilities.Mqtt.Runner/SmingCode.Utilities.Mqtt.Runner.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/SurianMing.Utilities.Mqtt.Runner/SurianMing.Utilities.Mqtt.Runner.csproj"
+                "${workspaceFolder}/SmingCode.Utilities.Mqtt.Runner/SmingCode.Utilities.Mqtt.Runner.csproj"
             ],
             "problemMatcher": "$msCompile"
         }
