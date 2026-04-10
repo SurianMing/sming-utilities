@@ -2,9 +2,9 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Diagnostics.Metrics;
 using Microsoft.Extensions.Hosting;
-using SmingCode.Utilities.ApplicationSettings;
 
 namespace SmingCode.Utilities.Kafka;
+using ServiceMetadata;
 
 public class KafkaApplicationBuilder : IHostApplicationBuilder
 {
@@ -46,7 +46,7 @@ public class KafkaApplicationBuilder : IHostApplicationBuilder
         Services.AddSingleton(kafkaServerOptions);
         Services.AddSingleton<IAdminClientProvider, AdminClientProvider>();
         Services.AddSingleton<ITopicManager, TopicManager>();
-        Services.InitialiseApplicationSettings();
+        Services.InitializeServiceMetadata();
         Services.AddHostedService<KafkaApplication>();
 
         return _hostApplicationBuilder.Build();

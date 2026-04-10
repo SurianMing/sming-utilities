@@ -1,16 +1,16 @@
 ﻿namespace SmingCode.Utilities.Kafka;
-using ApplicationSettings;
+using ServiceMetadata;
 
 internal class KafkaConsumer<TKey, TValue>(
     IServiceScopeFactory _serviceScopeFactory,
     ITopicManager _topicManager,
     KafkaConsumerDefinition<TKey, TValue> _kafkaConsumerDefinition,
-    IOptions<SmingApplicationSettings> smingApplicationSettingsOptions,
+    IServiceMetadataProvider serviceMetadataProvider,
     KafkaServerOptions _kafkaServerOptions,
     ILogger<KafkaConsumer<TKey, TValue>> _logger
 ) : IKafkaConsumer
 {
-    private SmingApplicationSettings _smingApplicationSettings = smingApplicationSettingsOptions.Value;
+    private readonly string _fullServiceDescriptor = serviceMetadataProvider.GetMetadata().FullServiceDescriptor;
 
     public void InitialiseEventConsumer(
         CancellationToken cancellationToken
@@ -111,7 +111,7 @@ internal class KafkaConsumer<TKey, TValue>(
         => _kafkaConsumerDefinition.IsolationMode switch
         {
             IsolationMode.PerServiceInstance => Guid.NewGuid().ToString(),
-            IsolationMode.PerServiceType => _smingApplicationSettings.ApplicationId,
+            IsolationMode.PerServiceType => _fullServiceDescriptor,
             _ => throw new NotSupportedException($"Isolation level {_kafkaConsumerDefinition.IsolationMode} not currently supported.")
         };
 
