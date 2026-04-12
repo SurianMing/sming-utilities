@@ -88,6 +88,8 @@ StyleCopReport.xml
 *.pgc
 *.pgd
 *.rsp
+# but not Directory.Build.rsp, as it configures directory-level build defaults
+!Directory.Build.rsp
 *.sbr
 *.tlb
 *.tli
@@ -389,6 +391,7 @@ FodyWeavers.xsd
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+**/*.lscache
 
 # Local History for Visual Studio Code
 .history/
@@ -421,10 +424,6 @@ autom4te.cache/
 *.tar.gz
 tarballs/
 test-results/
-
-# Mac bundle stuff
-*.dmg
-*.app
 
 # content below from: https://github.com/github/gitignore/blob/main/Global/macOS.gitignore
 # General
