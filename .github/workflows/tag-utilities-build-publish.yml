@@ -21,6 +21,7 @@ jobs:
           - SmingCode.Utilities.DelegateInvokers
           - SmingCode.Utilities.Logging.AspNetCore
           - SmingCode.Utilities.ServiceMetadata
+          - SmingCode.Utilities.StartupProcesses
           - SmingCode.Utilities.Testing.AutoDomainData
     needs: get-version-no
     uses: ./.github/workflows/build-test.yml
@@ -37,6 +38,7 @@ jobs:
           - SmingCode.Utilities.Kafka
           - SmingCode.Utilities.MinimalApi
           - SmingCode.Utilities.ProcessTracking
+          - SmingCode.Utilities.StartupProcesses.AspNetCore
     needs: [ get-version-no, build-test-publish-0 ]
     uses: ./.github/workflows/build-test.yml
     with:
