@@ -13,18 +13,13 @@ internal class KafkaDelegateInvoker<TKey, TValue>
         public override Func<IServiceProvider, ConsumeResult<TKey, TValue>, TParam> BuildParameterBuilder<TParam>(
             ParameterInfo parameterInfo
         ) => parameterInfo.GetCustomAttribute<FromEventKeyAttribute>() is not null
-                ? typeof(TKey) == typeof(TParam)
-                    ? (_, consumeResult) => consumeResult.Message.Key is TParam tParamVal
-                        ? tParamVal
-                        : throw new InvalidCastException("Mismatched key type in kafka message handling")
-                    : (_, consumeResult) => JsonSerializer.Deserialize<TParam>(consumeResult.Message.Key!.ToString()!)!
+                ? (_, consumeResult) => consumeResult.Message.Key is TParam tParamVal
+                    ? tParamVal
+                    : throw new InvalidCastException("Mismatched key type in kafka message handling")
                 : parameterInfo.GetCustomAttribute<FromEventValueAttribute>() is not null
-                    ? typeof(TValue) == typeof(TParam)
-                        ? (_, consumeResult) => consumeResult.Message.Value is TParam tParamVal
-                            ? tParamVal
-                            : throw new InvalidCastException("Mismatched value type in kafka message handling")
-                        // (TParam)Convert.ChangeType(consumeResult.Message.Value, typeof(TParam))!
-                        : (_, consumeResult) => JsonSerializer.Deserialize<TParam>(consumeResult.Message.Value!.ToString()!)!
+                    ? (_, consumeResult) => consumeResult.Message.Value is TParam tParamVal
+                        ? tParamVal
+                        : throw new InvalidCastException("Mismatched value type in kafka message handling")
                     : (serviceProvider, _) => serviceProvider.GetService<TParam>()!;
     }
 

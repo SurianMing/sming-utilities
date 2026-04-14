@@ -1,4 +1,7 @@
 ﻿namespace SmingCode.Utilities.Kafka;
+
+using System.Text;
+using System.Text.Json;
 using ServiceMetadata;
 
 internal class KafkaConsumer<TKey, TValue>(
@@ -147,6 +150,15 @@ internal class KafkaConsumer<TKey, TValue>(
                 ApiVersionRequest = false
             });
 
+        if (typeof(TKey) != typeof(Ignore))
+        {
+            consumerBuilder.SetKeyDeserializer(KafkaDeserializerFactory.GetDeserializer<TKey>());
+        }
+        if (typeof(TValue) != typeof(Ignore))
+        {
+            consumerBuilder.SetValueDeserializer(KafkaDeserializerFactory.GetDeserializer<TValue>());
+        }
+        
         return consumerBuilder.Build();
     }
 
@@ -160,5 +172,28 @@ internal class KafkaConsumer<TKey, TValue>(
             Console.WriteLine("Refreshing Metadata...");
             client.GetMetadata(TimeSpan.FromMilliseconds(5000));
         }
+    }
+}
+
+
+internal class KafkaDeserializerFactory
+{
+    internal static IDeserializer<T> GetDeserializer<T>()
+        => typeof(T) == typeof(string)
+            ? (IDeserializer<T>)new KafkaStringDeserializer()
+            : new KafkaDeserializer<T>();
+
+    private class KafkaStringDeserializer : IDeserializer<string>
+    {
+        public string Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
+            => Encoding.UTF8.GetString(data);
+    }
+
+    private class KafkaDeserializer<T> : IDeserializer<T>
+    {
+        public T Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
+            => !isNull
+                ? JsonSerializer.Deserialize<T>(Encoding.UTF8.GetString(data))!
+                : throw new InvalidCastException("Attempt to do stuff you just can't");
     }
 }
