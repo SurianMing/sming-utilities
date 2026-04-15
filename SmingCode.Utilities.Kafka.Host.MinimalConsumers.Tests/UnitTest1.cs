@@ -1,4 +1,4 @@
-namespace SmingCode.Utilities.Kafka.MinimalConsumers.Tests;
+namespace SmingCode.Utilities.Kafka.Host.MinimalConsumers.Tests;
 
 public class UnitTest1
 {

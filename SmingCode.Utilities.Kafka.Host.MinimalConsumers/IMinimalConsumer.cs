@@ -1,4 +1,4 @@
-﻿namespace SmingCode.Utilities.Kafka.MinimalConsumers;
+﻿namespace SmingCode.Utilities.Kafka.Host.MinimalConsumers;
 
 public interface IMinimalConsumer
 {

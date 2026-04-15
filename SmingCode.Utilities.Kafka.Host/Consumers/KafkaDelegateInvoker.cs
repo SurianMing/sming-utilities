@@ -1,8 +1,7 @@
 using System.Reflection;
-using System.Text.Json;
-using SmingCode.Utilities.DelegateInvokers;
 
-namespace SmingCode.Utilities.Kafka;
+namespace SmingCode.Utilities.Kafka.Consumers;
+using DelegateInvokers;
 
 internal class KafkaDelegateInvoker<TKey, TValue>
 {

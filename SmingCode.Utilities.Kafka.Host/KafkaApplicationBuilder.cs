@@ -3,12 +3,18 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Diagnostics.Metrics;
 using Microsoft.Extensions.Hosting;
 
-namespace SmingCode.Utilities.Kafka;
+namespace SmingCode.Utilities.Kafka.Host;
+using Consumers;
+using Producers;
 using ServiceMetadata;
 
-public class KafkaApplicationBuilder : IHostApplicationBuilder
+public class KafkaApplicationBuilder(
+    KafkaApplicationBuilderSettings? settings
+) : IHostApplicationBuilder
 {
-    private readonly HostApplicationBuilder _hostApplicationBuilder;
+    private readonly HostApplicationBuilder _hostApplicationBuilder = new (
+        settings?.ToHostApplicationBuilderSettings()
+    );
 
     public KafkaApplicationBuilder()
         : this(args: null) { }
@@ -16,11 +22,6 @@ public class KafkaApplicationBuilder : IHostApplicationBuilder
     public KafkaApplicationBuilder(string[]? args)
         : this(new KafkaApplicationBuilderSettings { Args = args })
     { }
-
-    public KafkaApplicationBuilder(KafkaApplicationBuilderSettings? settings)
-    {
-        _hostApplicationBuilder = new HostApplicationBuilder(settings?.ToHostApplicationBuilderSettings());
-    }
 
     public IHostEnvironment Environment => _hostApplicationBuilder.Environment;
     public ConfigurationManager Configuration => _hostApplicationBuilder.Configuration;
@@ -46,6 +47,7 @@ public class KafkaApplicationBuilder : IHostApplicationBuilder
         Services.AddSingleton(kafkaServerOptions);
         Services.AddSingleton<IAdminClientProvider, AdminClientProvider>();
         Services.AddSingleton<ITopicManager, TopicManager>();
+        Services.AddScoped<IKafkaProducer, KafkaProducer>();
         Services.InitializeServiceMetadata();
         Services.AddHostedService<KafkaApplication>();
 
