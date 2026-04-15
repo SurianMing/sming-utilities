@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Hosting;
 
-namespace SmingCode.Utilities.Kafka;
+namespace SmingCode.Utilities.Kafka.Host;
+using Consumers;
 
 internal class KafkaApplication(
     IEnumerable<IKafkaConsumerDefinition> kafkaConsumerDefinitions,

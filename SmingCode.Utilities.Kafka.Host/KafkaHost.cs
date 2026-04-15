@@ -1,4 +1,4 @@
-namespace SmingCode.Utilities.Kafka;
+namespace SmingCode.Utilities.Kafka.Host;
 
 public static class KafkaHost
 {

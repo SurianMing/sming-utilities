@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace SmingCode.Utilities.Kafka.MinimalConsumers;
+namespace SmingCode.Utilities.Kafka.Host.MinimalConsumers;
 
 public static class Injection
 {

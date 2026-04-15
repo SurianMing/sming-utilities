@@ -14,16 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SmingCode.Utilities.DelegateInvokers\SmingCode.Utilities.DelegateInvokers.csproj" />
-    <ProjectReference Include="..\SmingCode.Utilities.ServiceMetadata\SmingCode.Utilities.ServiceMetadata.csproj" />
+    <ProjectReference Include="..\SmingCode.Utilities.Kafka\SmingCode.Utilities.Kafka.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>$(AssemblyName).Tests</_Parameter1>
-    </AssemblyAttribute>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>$(AssemblyName).Host</_Parameter1>
+      <_Parameter1>SmingCode.Utilities.Kafka.MinimalConsumers</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 
