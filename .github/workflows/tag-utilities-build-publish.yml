@@ -64,7 +64,7 @@ jobs:
       matrix:
         utility-project-name:
           - SmingCode.Utilities.Kafka.Host.MinimalConsumers
-    needs: [ get-version-no, build-test-publish-1 ]
+    needs: [ get-version-no, build-test-publish-2 ]
     uses: ./.github/workflows/build-test.yml
     with:
       project-name: '${{ matrix.utility-project-name }}'
