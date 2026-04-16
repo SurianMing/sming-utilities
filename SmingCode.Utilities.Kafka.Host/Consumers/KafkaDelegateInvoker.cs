@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace SmingCode.Utilities.Kafka.Consumers;
+namespace SmingCode.Utilities.Kafka.Host.Consumers;
 using DelegateInvokers;
 
 internal class KafkaDelegateInvoker<TKey, TValue>

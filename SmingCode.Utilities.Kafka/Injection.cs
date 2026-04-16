@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SmingCode.Utilities.Kafka.Producers;
 
 namespace SmingCode.Utilities.Kafka;
@@ -13,9 +14,9 @@ public static class Injection
         var kafkaServerOptions = configuration.GetRequiredSection("Kafka")
             .Get<KafkaServerOptions>()
             ?? throw new InvalidOperationException("No valid kafka configuration section found.");
-        services.AddSingleton(kafkaServerOptions);
+        services.TryAddSingleton(kafkaServerOptions);
 
-        services.AddScoped<IKafkaProducer, KafkaProducer>();
+        services.TryAddScoped<IKafkaProducer, KafkaProducer>();
 
         return services;
     }

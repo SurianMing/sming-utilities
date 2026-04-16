@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace SmingCode.Utilities.Kafka.Host;
 using Consumers;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Producers;
 using ServiceMetadata;
 
@@ -44,10 +45,10 @@ public class KafkaApplicationBuilder(
         var kafkaServerOptions = Configuration.GetRequiredSection("Kafka")
             .Get<KafkaServerOptions>()
             ?? throw new InvalidOperationException("No valid kafka configuration section found.");
-        Services.AddSingleton(kafkaServerOptions);
+        Services.TryAddSingleton(kafkaServerOptions);
         Services.AddSingleton<IAdminClientProvider, AdminClientProvider>();
         Services.AddSingleton<ITopicManager, TopicManager>();
-        Services.AddScoped<IKafkaProducer, KafkaProducer>();
+        Services.TryAddScoped<IKafkaProducer, KafkaProducer>();
         Services.InitializeServiceMetadata();
         Services.AddHostedService<KafkaApplication>();
 
