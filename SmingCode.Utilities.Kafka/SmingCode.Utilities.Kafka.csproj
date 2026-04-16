@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SmingCode.Utilities.DelegateInvokers\SmingCode.Utilities.DelegateInvokers.csproj" />
     <ProjectReference Include="..\SmingCode.Utilities.ServiceMetadata\SmingCode.Utilities.ServiceMetadata.csproj" />
   </ItemGroup>
 
