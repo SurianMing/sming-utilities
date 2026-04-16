@@ -8,7 +8,9 @@ internal class KafkaSerializerFactory
     internal static ISerializer<T> GetSerializer<T>()
         => typeof(T) == typeof(string)
             ? (ISerializer<T>)new KafkaStringSerializer()
-            : new KafkaSerializer<T>();
+            : typeof(T) == typeof(Null)
+                ? (ISerializer<T>)Serializers.Null
+                : new KafkaSerializer<T>();
 
     private class KafkaStringSerializer : ISerializer<string>
     {

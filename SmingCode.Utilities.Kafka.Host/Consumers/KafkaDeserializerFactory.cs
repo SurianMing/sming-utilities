@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace SmingCode.Utilities.Kafka.Consumers;
+namespace SmingCode.Utilities.Kafka.Host.Consumers;
 
 internal class KafkaDeserializerFactory
 {

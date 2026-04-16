@@ -25,7 +25,7 @@ internal class KafkaProducerContext<TKey, TValue>(
 ) : IKafkaProducerContext<TKey, TValue>
 {
     private readonly TKey? _key =
-        key is not null || typeof(TKey) == typeof(Ignore)
+        key is not null || typeof(TKey) == typeof(Null)
             ? key
             : throw new Exception();
 

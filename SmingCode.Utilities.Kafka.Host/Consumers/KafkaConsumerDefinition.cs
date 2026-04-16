@@ -1,4 +1,4 @@
-namespace SmingCode.Utilities.Kafka.Consumers;
+namespace SmingCode.Utilities.Kafka.Host.Consumers;
 
 internal class KafkaConsumerDefinition<TKey, TValue>(
     string topicToMatch,

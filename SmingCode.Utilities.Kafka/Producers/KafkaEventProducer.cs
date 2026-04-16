@@ -9,7 +9,7 @@ internal class KafkaProducer(
     public async Task<bool> SendEvent<TValue>(
         string topic,
         TValue value
-    ) => await ProcessKafkaEvent<Ignore, TValue>(
+    ) => await ProcessKafkaEvent<Null, TValue>(
         topic,
         null,
         value
@@ -29,7 +29,7 @@ internal class KafkaProducer(
         string topic,
         TValue value,
         Headers headers
-    ) => await ProcessKafkaEvent<Ignore, TValue>(
+    ) => await ProcessKafkaEvent<Null, TValue>(
         topic,
         null,
         value,
@@ -73,7 +73,7 @@ internal class KafkaProducer(
                 Headers = kafkaProducerContext.Headers
             };
 
-            if (typeof(TKey) != typeof(Ignore) && kafkaProducerContext.HasKey)
+            if (typeof(TKey) != typeof(Null) && kafkaProducerContext.HasKey)
             {
                 message.Key = kafkaProducerContext.Key;
             }
@@ -109,14 +109,8 @@ internal class KafkaProducer(
                 Acks = Acks.All
             });
 
-        if (typeof(TKey) != typeof(Ignore))
-        {
-            producerBuilder.SetKeySerializer(KafkaSerializerFactory.GetSerializer<TKey>());
-        }
-        if (typeof(TValue) != typeof(Ignore))
-        {
-            producerBuilder.SetValueSerializer(KafkaSerializerFactory.GetSerializer<TValue>());
-        }
+        producerBuilder.SetKeySerializer(KafkaSerializerFactory.GetSerializer<TKey>());
+        producerBuilder.SetValueSerializer(KafkaSerializerFactory.GetSerializer<TValue>());
 
         return producerBuilder.Build();
     }
