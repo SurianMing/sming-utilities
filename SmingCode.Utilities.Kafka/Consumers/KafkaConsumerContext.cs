@@ -1,4 +1,4 @@
-namespace SmingCode.Utilities.Kafka.Host.Consumers;
+namespace SmingCode.Utilities.Kafka.Consumers;
 
 public class KafkaConsumerContext<TKey, TValue>(
     string topicConsumed,

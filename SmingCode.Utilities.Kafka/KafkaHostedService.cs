@@ -1,13 +1,13 @@
 using Microsoft.Extensions.Hosting;
 
-namespace SmingCode.Utilities.Kafka.Host;
+namespace SmingCode.Utilities.Kafka;
 using Consumers;
 
-internal class KafkaApplication(
+internal class KafkaHostedService(
     IEnumerable<IKafkaConsumerDefinition> kafkaConsumerDefinitions,
     KafkaServerOptions _kafkaServerOptions,
     IServiceProvider serviceProvider,
-    ILogger<KafkaApplication> _logger
+    ILogger<KafkaHostedService> _logger
 ) : BackgroundService
 {
     private readonly List<IKafkaConsumer> _kafkaConsumers = [.. kafkaConsumerDefinitions
