@@ -1,4 +1,4 @@
-﻿namespace SmingCode.Utilities.Kafka.Host.Consumers;
+﻿namespace SmingCode.Utilities.Kafka.Consumers;
 using ServiceMetadata;
 
 internal class KafkaConsumer<TKey, TValue>(
@@ -24,7 +24,8 @@ internal class KafkaConsumer<TKey, TValue>(
             clientGroupId
         );
 
-        Task.Run(() => MetadataRefresh(consumer.Handle), cancellationToken);
+        // Task.Run(() => MetadataRefresh(consumer.Handle), cancellationToken);
+        MetadataRefresh(consumer.Handle);
 
         consumer.Subscribe(topicToConsume);
 
@@ -195,11 +196,18 @@ internal class KafkaConsumer<TKey, TValue>(
     {
         using var client = new DependentAdminClientBuilder(handle).Build();
 
-        while (true)
-        {
-            Thread.Sleep(5000);
-            Console.WriteLine("Refreshing Metadata...");
-            client.GetMetadata(TimeSpan.FromMilliseconds(5000));
-        }
+        client.GetMetadata(TimeSpan.FromMilliseconds(5000));
     }
+
+    // private static void MetadataRefresh(Handle handle)
+    // {
+    //     using var client = new DependentAdminClientBuilder(handle).Build();
+
+    //     while (true)
+    //     {
+    //         Thread.Sleep(5000);
+    //         Console.WriteLine("Refreshing Metadata...");
+    //         client.GetMetadata(TimeSpan.FromMilliseconds(5000));
+    //     }
+    // }
 }

@@ -42,15 +42,8 @@ public class KafkaApplicationBuilder(
 
     public IHost Build()
     {
-        var kafkaServerOptions = Configuration.GetRequiredSection("Kafka")
-            .Get<KafkaServerOptions>()
-            ?? throw new InvalidOperationException("No valid kafka configuration section found.");
-        Services.TryAddSingleton(kafkaServerOptions);
-        Services.AddSingleton<IAdminClientProvider, AdminClientProvider>();
-        Services.AddSingleton<ITopicManager, TopicManager>();
-        Services.TryAddScoped<IKafkaProducer, KafkaProducer>();
+        Services.InitializeKafkaHandling(Configuration, true);
         Services.InitializeServiceMetadata();
-        Services.AddHostedService<KafkaApplication>();
 
         return _hostApplicationBuilder.Build();
     }
@@ -58,28 +51,8 @@ public class KafkaApplicationBuilder(
     public IKafkaConsumerDefinition MapConsumer(
         string topicToMatch,
         Delegate handler
-    )
-    {
-        var handlerMethodParameters = handler.Method.GetParameters();
-        var consumerKeyType = handlerMethodParameters
-            .SingleOrDefault(parameter => parameter.GetCustomAttribute<FromEventKeyAttribute>() is not null)
-                ?.ParameterType
-                ?? typeof(Ignore);
-        var consumerValueType = handlerMethodParameters
-            .SingleOrDefault(parameter => parameter.GetCustomAttribute<FromEventValueAttribute>() is not null)
-                ?.ParameterType
-                ?? typeof(Ignore);
-
-        var kafkaConsumerDefinitionType = typeof(KafkaConsumerDefinition<,>);
-        var typedKafkaConsumerDefinitionType = kafkaConsumerDefinitionType
-            .MakeGenericType(consumerKeyType, consumerValueType);
-
-        var newKafkaConsumerDefinition = (IKafkaConsumerDefinition)Activator.CreateInstance(
-            typedKafkaConsumerDefinitionType,
-            [ topicToMatch, handler ]
-        )!;
-        Services.AddSingleton(newKafkaConsumerDefinition);
-
-        return newKafkaConsumerDefinition;
-    }
+    ) => Services.MapConsumer(
+        topicToMatch,
+        handler
+    );
 }

@@ -1,23 +1,24 @@
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace SmingCode.Utilities.Kafka.Host.MinimalConsumers;
+namespace SmingCode.Utilities.Kafka.MinimalConsumers;
 
 public static class Injection
 {
-    public static KafkaApplicationBuilder LoadConsumers(
-        this KafkaApplicationBuilder builder
+    public static IServiceCollection LoadConsumers(
+        this IServiceCollection builder
     ) => builder.LoadConsumers(Assembly.GetCallingAssembly());
 
-    public static KafkaApplicationBuilder LoadConsumers<TConsumerLocator>(
-        this KafkaApplicationBuilder builder
+    public static IServiceCollection LoadConsumers<TConsumerLocator>(
+        this IServiceCollection builder
     ) => builder.LoadConsumers(
         Assembly.GetAssembly(typeof(TConsumerLocator))
             ?? throw new InvalidOperationException(
                 $"No loaded assembly contains the Consumer {typeof(TConsumerLocator).Name}."
             ));
 
-    public static KafkaApplicationBuilder LoadConsumers(
-        this KafkaApplicationBuilder builder,
+    public static IServiceCollection LoadConsumers(
+        this IServiceCollection builder,
         Assembly consumersAssembly
     )
     {
