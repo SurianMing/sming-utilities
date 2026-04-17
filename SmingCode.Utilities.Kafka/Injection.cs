@@ -47,29 +47,14 @@ public static class Injection
         var kafkaServerOptions = configuration.GetRequiredSection("Kafka")
             .Get<KafkaServerOptions>()
             ?? throw new InvalidOperationException("No valid kafka configuration section found.");
-        services.TryAddSingleton(kafkaServerOptions);
+        services.AddSingleton(kafkaServerOptions);
         services.AddSingleton<IAdminClientProvider, AdminClientProvider>();
         services.AddSingleton<ITopicManager, TopicManager>();
-        services.TryAddScoped<IKafkaProducer, KafkaProducer>();
+        services.AddScoped<IKafkaProducer, KafkaProducer>();
         if (includeConsumers)
         {
             services.AddHostedService<KafkaHostedService>();
         }
-
-        return services;
-    }
-
-    public static IServiceCollection AddKafkaProducing(
-        this IServiceCollection services,
-        IConfiguration configuration
-    )
-    {
-        var kafkaServerOptions = configuration.GetRequiredSection("Kafka")
-            .Get<KafkaServerOptions>()
-            ?? throw new InvalidOperationException("No valid kafka configuration section found.");
-        services.TryAddSingleton(kafkaServerOptions);
-
-        services.TryAddScoped<IKafkaProducer, KafkaProducer>();
 
         return services;
     }
