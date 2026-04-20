@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
 namespace SmingCode.Utilities.ProcessTracking.WebApi;
@@ -13,17 +11,37 @@ internal class ProcessTrackingHeaderMiddleware(
 {
     public async Task InvokeAsync(
         HttpContext httpContext,
-        IProcessTrackingHeadersProvider processTrackingHeadersProvider,
         IProcessTrackingHandler processTrackingHandler
     )
     {
-        var processTrackingDetail = ((IProcessTrackingHeadersProviderInternal)processTrackingHeadersProvider).GetProcessTrackingDetailFromHeaders(
-            httpContext.Request
-        );
-        processTrackingHandler.SetProcessTrackingDetail(processTrackingDetail);
+        var headers = httpContext.Request.Headers;
+
+        if (_logger.IsEnabled(LogLevel.Trace))
+        {
+            _logger.LogTrace(
+                "Incoming headers are: {HeaderInfo}",
+                string.Join(
+                    ",",
+                    headers.Select(header =>
+                        $"{header.Key}:{header.Value}"
+                    )
+                )
+            );
+        }
+
+        if (!processTrackingHandler.TryLoadProcessDetailFromIncomingTags(
+            headers.ToDictionary(
+                header => header.Key,
+                header => (object)header.Value
+            ),
+            out var processTrackingDetail
+        ))
+        {
+            throw new Exception();
+        }
 
         using var scope = _logger.BeginScope(
-            processTrackingDetail.GetActivityTags()
+            processTrackingHandler.StructuredLoggingMetadata
                 .Concat(serviceMetadataProvider.GetMetadata().GetCustomDimensions())
         );
 

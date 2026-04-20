@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace SmingCode.Utilities.ProcessTracking.WebApi;
+using StartupProcesses;
 
 public static class Injection
 {
@@ -10,17 +10,17 @@ public static class Injection
     )
     {
         var services = ((IProcessTrackingBuilderInternal)builder).Services;
-        services.AddScoped<IProcessTrackingHeadersProvider, ProcessTrackingHeadersProvider>();
+        services.AddScoped<IServiceInitializer, ProcessTrackingInitialization>();
 
         return new ValidProcessTrackingBuilder(services);
     }
 
-    public static IApplicationBuilder UseProcessTrackingMiddleware(
-        this IApplicationBuilder applicationBuilder
-    )
-    {
-        applicationBuilder.UseMiddleware<ProcessTrackingHeaderMiddleware>();
+    // public static IApplicationBuilder UseProcessTrackingMiddleware(
+    //     this IApplicationBuilder applicationBuilder
+    // )
+    // {
+    //     applicationBuilder.UseMiddleware<ProcessTrackingHeaderMiddleware>();
 
-        return applicationBuilder;
-    }
+    //     return applicationBuilder;
+    // }
 }
