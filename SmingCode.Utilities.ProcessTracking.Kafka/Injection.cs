@@ -1,6 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using SmingCode.Utilities.Kafka.Consumers;
-
 namespace SmingCode.Utilities.ProcessTracking.Kafka;
 
 public static class Injection

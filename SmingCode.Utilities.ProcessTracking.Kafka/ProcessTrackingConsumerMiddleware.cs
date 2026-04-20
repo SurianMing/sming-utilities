@@ -1,11 +1,9 @@
+using System.Text;
 using Microsoft.Extensions.Logging;
 
 namespace SmingCode.Utilities.ProcessTracking.Kafka;
-
-using System.Text;
-using Microsoft.Extensions.DependencyInjection;
 using ServiceMetadata;
-using SmingCode.Utilities.Kafka.Consumers;
+using Utilities.Kafka.Consumers;
 
 internal class ProcessTrackingConsumerMiddleware(
     IServiceMetadataProvider serviceMetadataProvider,

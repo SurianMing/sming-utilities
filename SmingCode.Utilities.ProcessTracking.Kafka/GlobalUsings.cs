@@ -1,3 +1,3 @@
-global using Confluent.Kafka;
+global using Microsoft.Extensions.DependencyInjection;
 
-global using SmingCode.Utilities.Kafka;
+global using SmingCode.Utilities.Kafka.Consumers;
