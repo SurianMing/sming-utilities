@@ -1,7 +1,4 @@
-using Azure.Monitor.OpenTelemetry.Exporter;
 using Microsoft.Extensions.DependencyInjection;
-using OpenTelemetry;
-using OpenTelemetry.Trace;
 
 namespace SmingCode.Utilities.ProcessTracking;
 
@@ -16,8 +13,6 @@ public static class Injection
         initialization(processTrackingBuilder);
 
         services.AddScoped<IProcessTrackingHandler, ProcessTrackingHandler>();
-        // services.AddSingleton<IProcessTrackingManager, ProcessTrackingManager>();
-        // services.AddSingleton<ProcessTrackingHandlerManager>();
 
         return services;
     }
