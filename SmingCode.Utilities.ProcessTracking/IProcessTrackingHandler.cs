@@ -4,8 +4,13 @@ namespace SmingCode.Utilities.ProcessTracking;
 
 internal interface IProcessTrackingHandler
 {
-    bool TryGetProcessTrackingDetail(
+    bool IsConfigured { get; }
+    ProcessTrackingDetail ProcessTrackingDetail { get; }
+    Dictionary<string, object> ProcessTags { get; }
+    void SetProcessTrackingDetail(ProcessTrackingDetail detail);
+    bool TryLoadProcessDetailFromIncomingTags(
+        IEnumerable<KeyValuePair<string, object>> incomingTags,
         [NotNullWhen(true)] out ProcessTrackingDetail? processTrackingDetail
     );
-    void SetProcessTrackingDetail(ProcessTrackingDetail detail);
+    Dictionary<string, object> StructuredLoggingMetadata { get; }
 }

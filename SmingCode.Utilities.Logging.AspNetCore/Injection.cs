@@ -13,7 +13,7 @@ public static class Injection
     {
         builder.Services.AddOpenTelemetry()
             .UseAzureMonitor();
-            
+
         builder.Logging.AddOpenTelemetry(options => options.IncludeScopes = true);
 
         return builder;
