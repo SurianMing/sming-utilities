@@ -7,7 +7,7 @@ public static class Injection
     )
     {
         var services = ((IProcessTrackingBuilderInternal)builder).Services;
-        services.AddScoped<IKafkaConsumerMiddleware, ProcessTrackingConsumerMiddleware>();
+        services.AddSingleton<IKafkaConsumerMiddleware, ProcessTrackingConsumerMiddleware>();
 
         return new ValidProcessTrackingBuilder(services);
     }
