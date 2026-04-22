@@ -1,37 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace SmingCode.Utilities.ServiceApiClient;
-
-public static class Injection
-{
-    public static IServiceCollection AddApiClient<TInterface, TService>(
-        this IServiceCollection services,
-        string serviceDisplayName,
-        string serviceName
-    ) where TInterface : class
-      where TService : class, TInterface
-    {
-        services.AddTransient<ExtendableDelegatingHandler<TService>>();
-        ApiClientConfiguration<TService> apiClientConfiguration = new(
-            serviceDisplayName,
-            serviceName
-        );
-        services.AddSingleton(apiClientConfiguration);
-
-        services.AddHttpClient<TService>(config =>
-        {
-            config.BaseAddress = new Uri($"http://{serviceName}");
-        }).AddHttpMessageHandler<ExtendableDelegatingHandler<TService>>();
-
-        return services;
-    }
-}
-
-internal record ApiClientConfiguration<TService>(
-    string ServiceDisplayName,
-    string ServiceName
-);
 
 internal class ExtendableDelegatingHandler<TService>(
     IEnumerable<IDelegateHandlingExtension>? _delegateHandlingExtensions,
@@ -63,14 +32,7 @@ internal class ExtendableDelegatingHandler<TService>(
                 request = delegateHandlingExtension.Handle(request);
             }
 
-            return await base.SendAsync(request, cancellationToken);            
+            return await base.SendAsync(request, cancellationToken);
         }
     }
-}
-
-public interface IDelegateHandlingExtension
-{
-    HttpRequestMessage Handle(
-        HttpRequestMessage requestMessage
-    );
 }
