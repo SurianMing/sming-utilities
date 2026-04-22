@@ -9,14 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
     <PackageReference Include="Shouldly" Version="4.3.0" />
     <PackageReference Include="xunit.v3.mtp-v2" Version="3.2.2" />
@@ -24,6 +16,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SmingCode.Utilities.DelegateInvokers\SmingCode.Utilities.DelegateInvokers.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
   </ItemGroup>
 
 </Project>

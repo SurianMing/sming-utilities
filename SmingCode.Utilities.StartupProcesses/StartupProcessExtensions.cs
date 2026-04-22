@@ -6,46 +6,64 @@ namespace SmingCode.Utilities.StartupProcesses;
 public static class StartupProcessExtensions
 {
     public static async Task<IHost> RunUserDefinedStartupProcesses(
-        this IHost host
+        this IHost host,
+        Action<IStartupProcessDependency>? dependencyManager = null
     )
     {
         using var scope = host.Services.CreateScope();
-
         var serviceProvider = scope.ServiceProvider;
-        var delegateInvokers = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(assembly => assembly.GetTypes())
-            .Where(type =>
-                type.IsAssignableTo(typeof(IStartupProcessDelegateInvoker))
-                && !type.IsAbstract && !type.IsInterface
-            )
-            .Select(Activator.CreateInstance)
-            .OfType<IStartupProcessDelegateInvoker>()
-            .ToList();
+        var serviceInitializers = serviceProvider.GetService<IEnumerable<IServiceInitializer>>()
+            ?.ToArray();
 
-        var serviceInitializers = serviceProvider.GetService<IEnumerable<IServiceInitializer>>();
-
-        if (serviceInitializers is not null)
+        if (serviceInitializers is null || serviceInitializers.Length == 0)
         {
-            foreach (var serviceInitializer in serviceInitializers)
+            return host;
+        }
+
+        var startProcessInvokersProvider = new StartupProcessDelegateInvokerProvider();
+        if (dependencyManager is not null)
+        {
+            dependencyManager(startProcessInvokersProvider);
+        }
+        var delegateInvokers = startProcessInvokersProvider.GetStartupProcessDelegateInvokers();
+
+        foreach (var serviceInitializer in serviceInitializers)
+        {
+            var success = await TryRunningServiceInitializer(
+                serviceInitializer,
+                delegateInvokers,
+                host,
+                serviceProvider
+            );
+
+            if (!success)
             {
-                var success = false;
-
-                foreach (var delegateInvoker in delegateInvokers)
-                {
-                    success = success || await delegateInvoker.TryInvoke(
-                        host,
-                        serviceProvider,
-                        serviceInitializer.ServiceInitializer
-                    );
-                }
-
-                if (!success)
-                {
-                    throw new Exception("Unable to run all service initializers. Some startup processes may require additional startup processors to be loaded.");
-                }
+                throw new Exception("Unable to run all service initializers. Some startup processes may require additional startup processors to be loaded.");
             }
         }
 
         return host;
+    }
+
+    private static async Task<bool> TryRunningServiceInitializer(
+        IServiceInitializer serviceInitializer,
+        IStartupProcessDelegateInvoker[] delegateInvokers,
+        IHost host,
+        IServiceProvider serviceProvider
+    )
+    {
+        foreach (var delegateInvoker in delegateInvokers)
+        {
+            if (await delegateInvoker.TryInvoke(
+                host,
+                serviceProvider,
+                serviceInitializer.ServiceInitializer
+            ))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

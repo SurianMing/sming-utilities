@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Hosting;
 
-namespace SmingCode.Utilities.StartupProcesses.AspNetCore;
+namespace SmingCode.Utilities.StartupProcesses;
 
 internal class DefaultStartupProcessDelegateInvoker : IStartupProcessDelegateInvoker
 {

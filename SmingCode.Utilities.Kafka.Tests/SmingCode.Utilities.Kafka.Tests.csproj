@@ -9,19 +9,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="xunit.v3.mtp-v2" Version="3.2.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SmingCode.Utilities.Kafka\SmingCode.Utilities.Kafka.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
   </ItemGroup>
 
 </Project>
