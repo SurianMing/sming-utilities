@@ -42,3 +42,12 @@ internal class WebApplicationStartupProcessDelegateInvoker : IStartupProcessDele
         return true;
     }
 }
+
+public static class WebApplicationStartupProcessDelegateInvokerDependencyExtensions
+{
+    public static IStartupProcessDependency EnableAspNetCore(
+        this IStartupProcessDependency dependencyProvider
+    ) => ((IStartupProcessDelegateInvokerProvider)dependencyProvider).AddStartupProcessDelegateInvoker(
+        new WebApplicationStartupProcessDelegateInvoker()
+    );
+}
