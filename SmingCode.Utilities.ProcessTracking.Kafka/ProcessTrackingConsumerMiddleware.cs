@@ -21,20 +21,6 @@ internal class ProcessTrackingConsumerMiddleware(
                 header => Encoding.UTF8.GetString(header.GetValueBytes())
             );
 
-
-        if (_logger.IsEnabled(LogLevel.Trace))
-        {
-            _logger.LogTrace(
-                "Incoming headers are: {HeaderInfo}",
-                string.Join(
-                    ",",
-                    messageHeaders.Select(messageHeader =>
-                        $"{messageHeader.Key}:{messageHeader.Value}"
-                    )
-                )
-            );
-        }
-
         var processTrackingHandler = context.ServiceProvider.GetRequiredService<IProcessTrackingHandler>();
 
         if (!processTrackingHandler.TryLoadProcessDetailFromIncomingTags(
@@ -45,13 +31,24 @@ internal class ProcessTrackingConsumerMiddleware(
             out var processTrackingDetail
         ))
         {
-            throw new Exception();
+            _logger.LogError(
+                "Unable to load process tracking headers. Marking message as unprocessed"
+            );
+
+            return KafkaEventResult.Incomplete;
         }
 
         using var scope = _logger.BeginScope(
             processTrackingHandler.StructuredLoggingMetadata
                 .Concat(serviceMetadataProvider.GetMetadata().GetCustomDimensions())
         );
+
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation(
+                "Process tracking details loaded from incoming message headers."
+            );
+        }
 
         var result = await kafkaConsumeDelegate(
             context
