@@ -7,6 +7,6 @@ internal class ProcessTrackingInitialization : IServiceInitializer
 {
     public Delegate ServiceInitializer => (IApplicationBuilder applicationBuilder) =>
     {
-        applicationBuilder.UseMiddleware<ProcessTrackingHeaderMiddleware>();        
+        applicationBuilder.UseMiddleware<WebApiIngressMiddleware>();
     };
 }

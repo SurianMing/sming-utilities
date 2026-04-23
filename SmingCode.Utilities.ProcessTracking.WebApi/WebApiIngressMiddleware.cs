@@ -3,10 +3,10 @@ using Microsoft.Extensions.Logging;
 namespace SmingCode.Utilities.ProcessTracking.WebApi;
 using ServiceMetadata;
 
-internal class ProcessTrackingHeaderMiddleware(
+internal class WebApiIngressMiddleware(
     RequestDelegate _next,
     IServiceMetadataProvider serviceMetadataProvider,
-    ILogger<ProcessTrackingHeaderMiddleware> _logger
+    ILogger<WebApiIngressMiddleware> _logger
 )
 {
     public async Task InvokeAsync(
