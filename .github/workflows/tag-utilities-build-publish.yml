@@ -20,6 +20,7 @@ jobs:
         utility-project-name:
           - SmingCode.Utilities.DelegateInvokers
           - SmingCode.Utilities.Logging.AspNetCore
+          - SmingCode.Utilities.ServiceApiClient
           - SmingCode.Utilities.ServiceMetadata
           - SmingCode.Utilities.StartupProcesses
           - SmingCode.Utilities.Testing.AutoDomainData
