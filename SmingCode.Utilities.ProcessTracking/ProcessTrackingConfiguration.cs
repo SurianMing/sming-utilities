@@ -1,6 +1,6 @@
 namespace SmingCode.Utilities.ProcessTracking;
 
-internal class ProcessTrackingConfiguration
+public class ProcessTrackingConfiguration
 {
     public string ServiceInstanceId { get; set; } = Guid.NewGuid().ToString();
     public required string ServiceName { get; set; }

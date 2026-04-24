@@ -1,5 +1,5 @@
+using System.Net.Mime;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace SmingCode.Utilities.ServiceApiClient;
 
@@ -14,18 +14,18 @@ public static class Injection
     ) where TInterface : class
       where TService : class, TInterface
     {
-        services.AddTransient<ExtendableDelegatingHandler<TService>>();
         ApiClientConfiguration<TService> apiClientConfiguration = new(
             targetServiceDisplayName,
             targetServiceName
         );
         services.AddSingleton(apiClientConfiguration);
 
-        services.AddHttpClient<TInterface, TService>(config =>
+        services.AddHttpClient<IServiceApiClient<TService>, ApiClient<TService>>(config =>
         {
             config.BaseAddress = new Uri($"http://{targetServiceName}");
             config.Timeout = TimeSpan.FromSeconds(DEFAULT_TIMEOUT_SECONDS);
-        }).AddHttpMessageHandler<ExtendableDelegatingHandler<TService>>();
+        });
+        services.AddScoped<TInterface, TService>();
 
         return services;
     }
@@ -38,19 +38,19 @@ public static class Injection
     ) where TInterface : class
       where TService : class, TInterface
     {
-        services.AddTransient<ExtendableDelegatingHandler<TService>>();
         ApiClientConfiguration<TService> apiClientConfiguration = new(
             targetServiceDisplayName,
             targetServiceName
         );
         services.AddSingleton(apiClientConfiguration);
 
-        services.AddHttpClient<TInterface, TService>(config =>
+        services.AddHttpClient<IServiceApiClient<TService>, ApiClient<TService>>(config =>
         {
             config.BaseAddress = new Uri($"http://{targetServiceName}");
             config.Timeout = TimeSpan.FromSeconds(DEFAULT_TIMEOUT_SECONDS);
             clientConfiguration(config);
-        }).AddHttpMessageHandler<ExtendableDelegatingHandler<TService>>();
+        });
+        services.AddScoped<TInterface, TService>();
 
         return services;
     }

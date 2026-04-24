@@ -124,10 +124,17 @@ internal class KafkaConsumer<TKey, TValue>(
             )
         );
 
-        foreach (var kafkaConsumerMiddleware in _kafkaConsumerMiddlewares)
+        foreach (var kafkaConsumerMiddleware in _kafkaConsumerMiddlewares.Reverse())
         {
+            var newDelegateHandler = new KafkaConsumeDelegateHandler<TKey, TValue>(
+                handlerDelegate
+            );
+
             handlerDelegate = new KafkaConsumeDelegate<TKey, TValue>(async (kafkaConsumerContext) =>
-                await handlerDelegate(kafkaConsumerContext)
+                await kafkaConsumerMiddleware.HandleAsync(
+                    kafkaConsumerContext,
+                    newDelegateHandler
+                )
             );
         }
 

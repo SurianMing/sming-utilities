@@ -1,15 +1,16 @@
 using Microsoft.Extensions.Logging;
 
 namespace SmingCode.Utilities.ProcessTracking.WebApi;
-using SmingCode.Utilities.ServiceApiClient;
+using ServiceApiClient;
 
-internal class ProcessTrackingHttpClientInjection(
+internal class ProcessTrackingApiClientSendMiddleware(
     IProcessTrackingHandler _processTrackingHandler,
-    ILogger<ProcessTrackingHttpClientInjection> _logger
-) : IDelegateHandlingExtension
+    ILogger<ProcessTrackingApiClientSendMiddleware> _logger
+) : IApiClientSendMiddleware
 {
-    public HttpRequestMessage Handle(
-        HttpRequestMessage requestMessage
+    public async Task<TResponse> HandleAsync<TBody, TResponse>(
+        ApiClientSendContext<TBody, TResponse> context,
+        IApiClientSendDelegateHandler<TBody, TResponse> apiClientSendDelegate
     )
     {
         var currentProcessTags = _processTrackingHandler.ProcessTags;
@@ -29,9 +30,9 @@ internal class ProcessTrackingHttpClientInjection(
 
         foreach (var processTag in currentProcessTags)
         {
-            requestMessage.Headers.Add(processTag.Key, processTag.Value.ToString());
+            context.MessageHeaders.Add(processTag.Key, processTag.Value.ToString()!);
         }
 
-        return requestMessage;
+        return await apiClientSendDelegate.Next(context);
     }
 }

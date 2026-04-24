@@ -12,7 +12,7 @@ internal class ProcessTrackingConsumerMiddleware(
 {
     public async Task<KafkaEventResult> HandleAsync<TKey, TValue>(
         KafkaConsumerContext<TKey, TValue> context,
-        KafkaConsumeDelegate<TKey, TValue> kafkaConsumeDelegate
+        IKafkaConsumeDelegateHandler<TKey, TValue> kafkaConsumeDelegateHandler
     )
     {
         var messageHeaders = context.ConsumeResult.Message.Headers
@@ -50,7 +50,7 @@ internal class ProcessTrackingConsumerMiddleware(
             );
         }
 
-        var result = await kafkaConsumeDelegate(
+        var result = await kafkaConsumeDelegateHandler.Next(
             context
         );
 
