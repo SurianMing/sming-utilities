@@ -4,7 +4,7 @@ public interface IKafkaConsumerMiddleware
 {
     Task<KafkaEventResult> HandleAsync<TKey, TValue>(
         KafkaConsumerContext<TKey, TValue> context,
-        KafkaConsumeDelegate<TKey, TValue> kafkaConsumeDelegate
+        IKafkaConsumeDelegateHandler<TKey, TValue> kafkaConsumeDelegateHandler
     );
 }
 

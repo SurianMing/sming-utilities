@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SmingCode.Utilities.ProcessTracking;
 
-internal interface IProcessTrackingHandler
+public interface IProcessTrackingHandler
 {
     bool IsConfigured { get; }
     ProcessTrackingDetail ProcessTrackingDetail { get; }

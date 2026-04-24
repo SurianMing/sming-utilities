@@ -1,6 +1,6 @@
 namespace SmingCode.Utilities.ProcessTracking;
 
-internal record ProcessTrackingDetail(
+public record ProcessTrackingDetail(
     string CorrelationId,
     string ProcessId
 );

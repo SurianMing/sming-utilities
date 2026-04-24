@@ -86,10 +86,17 @@ internal class KafkaProducer(
             return deliveryResult.Status == PersistenceStatus.Persisted;
         });
 
-        foreach (var kafkaProducerMiddleware in _kafkaProducerMiddlewares)
+        foreach (var kafkaProducerMiddleware in _kafkaProducerMiddlewares.Reverse())
         {
+            var newDelegateHandler = new KafkaProducerDelegateHandler<TKey, TValue>(
+                produceDelegate
+            );
+
             produceDelegate = new KafkaProducerDelegate<TKey, TValue>(async (kafkaProducerContext) =>
-                await produceDelegate(kafkaProducerContext)
+                await kafkaProducerMiddleware.HandleAsync(
+                    kafkaProducerContext,
+                    newDelegateHandler
+                )
             );
         }
 

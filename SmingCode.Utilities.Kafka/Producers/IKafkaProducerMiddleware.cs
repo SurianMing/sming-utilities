@@ -4,7 +4,7 @@ public interface IKafkaProducerMiddleware
 {
     Task<bool> HandleAsync<TKey, TValue>(
         IKafkaProducerContext<TKey, TValue> context,
-        KafkaProducerDelegate<TKey, TValue> kafkaProducerDelegate
+        IKafkaProducerDelegateHandler<TKey, TValue> kafkaProducerDelegateHandler
     );
 }
 

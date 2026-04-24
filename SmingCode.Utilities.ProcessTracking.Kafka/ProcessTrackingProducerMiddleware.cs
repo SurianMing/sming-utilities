@@ -9,7 +9,7 @@ internal class ProcessTrackingProducerMiddleware(
 {
     public async Task<bool> HandleAsync<TKey, TValue>(
         IKafkaProducerContext<TKey, TValue> context,
-        KafkaProducerDelegate<TKey, TValue> kafkaProduceDelegate
+        IKafkaProducerDelegateHandler<TKey, TValue> kafkaProduceDelegateHandler
     )
     {
         var processTrackingHandler = context.ServiceProvider
@@ -34,7 +34,7 @@ internal class ProcessTrackingProducerMiddleware(
             context.AddHeader(tag.Key, tag.Value.ToString()!);
         }
 
-        var result = await kafkaProduceDelegate(
+        var result = await kafkaProduceDelegateHandler.Next(
             context
         );
 
