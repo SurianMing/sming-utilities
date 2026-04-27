@@ -1,5 +1,5 @@
+using System.Linq.Expressions;
 using System.Net.Http.Json;
-using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 
 namespace SmingCode.Utilities.ServiceApiClient;
@@ -12,7 +12,6 @@ internal class ApiClient<TService>(
     ILogger<ApiClient<TService>> _logger
 ) : IServiceApiClient<TService> where TService : class
 {
-    private const string TRACE_TYPE = "Service Api Client";
     public HttpClient HttpClient => _httpClient;
 
     public async Task Post(
@@ -53,6 +52,54 @@ internal class ApiClient<TService>(
             new NoBody(),
             messageHeaders
         );
+
+    private async Func<ApiClientSendContext<TBody, TResponse>, TResponse> BuildPipeline<TBody, TResponse>(
+
+    ) where TBody : notnull where TResponse : notnull
+    {
+        Func<ApiClientSendContext<TBody, TResponse>, Task<TResponse>> finalStage = async (context) =>
+        {
+            var response = await SendAndCheckSuccessfulResponse<TResponse>(
+                context.HttpMethod,
+                context.TargetUrl,
+                context.MessageHeaders,
+                typeof(TBody) == typeof(NoBody)
+                    ? null
+                    : new RequestBody<TBody>(
+                        context.Body,
+                        _apiClientConfiguration.JsonSerializerOptions
+                    )
+            );
+
+            return response;
+        };
+
+        var contextMethodType = typeof(ApiClientSendContext<TBody, TResponse>);
+        foreach (var middleware in _apiClientSendMiddlewares)
+        {
+            var handleMethod = middleware.GetType().GetMethod("HandleAsync")
+                ?? throw new InvalidOperationException(
+                    "Attempt to inject ApiClientSend middleware, but injected class does not contain a HandleAsync method."
+                );
+
+            var handleMethodParams = handleMethod.GetParameters();
+            if (handleMethodParams.All(
+                param => param.ParameterType == contextMethodType
+                    && param.Name == "context"))
+            {
+                throw new InvalidOperationException(
+                    $"Attempt to inject ApiClientSend middleware, but injected class's HandleAsync method does not take a context parameter of type {contextMethodType.Name}."
+                );
+            }
+
+            ParameterExpression[] parameterExpressions = [];
+            foreach (var param in handleMethodParams)
+            {
+                var newParamExpression = param.ParameterType == contextMethodType
+                    ? 
+            }
+        }
+    }
 
     private async Task<TResponse> ProcessSendAndCheckSuccessfulResponse<TBody, TResponse>(
         HttpMethod httpMethod,
@@ -160,7 +207,7 @@ internal class ApiClient<TService>(
                 "Service Api Client targeting service {TargetServiceName} sending request {RequestDetail} - {TraceType}",
                 _apiClientConfiguration.ServiceDisplayName,
                 requestMessageDetail.LogDetail,
-                TRACE_TYPE
+                Constants.UTILITY_TRACE_TYPE
             );
         }
     }
@@ -179,7 +226,7 @@ internal class ApiClient<TService>(
                 _apiClientConfiguration.ServiceDisplayName,
                 responseMessage.StatusCode,
                 responseContent,
-                TRACE_TYPE
+                Constants.UTILITY_TRACE_TYPE
             );
 
             if (throwIfUnsuccessful)
@@ -208,7 +255,7 @@ internal class ApiClient<TService>(
                 "Service Api Client targeting service {TargetServiceName} received response with details: {ResponseDetails} - {TraceType}",
                 _apiClientConfiguration.ServiceDisplayName,
                 responseDetails,
-                TRACE_TYPE
+                Constants.UTILITY_TRACE_TYPE
             );
         }
     }
@@ -223,7 +270,7 @@ internal class ApiClient<TService>(
             "Service Api Client targeting service {TargetServiceName} at url {TargetUrl} failed - {TraceType}",
             _apiClientConfiguration.ServiceDisplayName,
             fullUri,
-            TRACE_TYPE
+            Constants.UTILITY_TRACE_TYPE
         );
     }
 }

@@ -1,9 +1,8 @@
-using System.Net.Mime;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace SmingCode.Utilities.ServiceApiClient;
 
-public static class Injection
+public static class Configuration
 {
     private const int DEFAULT_TIMEOUT_SECONDS = 60;
 
