@@ -53,53 +53,57 @@ internal class ApiClient<TService>(
             messageHeaders
         );
 
-    private async Func<ApiClientSendContext<TBody, TResponse>, TResponse> BuildPipeline<TBody, TResponse>(
+    // private async Func<ApiClientSendContext<TBody, TResponse>, TResponse> BuildPipeline<TBody, TResponse>(
 
-    ) where TBody : notnull where TResponse : notnull
-    {
-        Func<ApiClientSendContext<TBody, TResponse>, Task<TResponse>> finalStage = async (context) =>
-        {
-            var response = await SendAndCheckSuccessfulResponse<TResponse>(
-                context.HttpMethod,
-                context.TargetUrl,
-                context.MessageHeaders,
-                typeof(TBody) == typeof(NoBody)
-                    ? null
-                    : new RequestBody<TBody>(
-                        context.Body,
-                        _apiClientConfiguration.JsonSerializerOptions
-                    )
-            );
+    // ) where TBody : notnull where TResponse : notnull
+    // {
+    //     Func<ApiClientSendContext<TBody, TResponse>, Task<TResponse>> finalStage = async (context) =>
+    //     {
+    //         var response = await SendAndCheckSuccessfulResponse<TResponse>(
+    //             context.HttpMethod,
+    //             context.TargetUrl,
+    //             context.MessageHeaders,
+    //             typeof(TBody) == typeof(NoBody)
+    //                 ? null
+    //                 : new RequestBody<TBody>(
+    //                     context.Body,
+    //                     _apiClientConfiguration.JsonSerializerOptions
+    //                 )
+    //         );
 
-            return response;
-        };
+    //         return response;
+    //     };
 
-        var contextMethodType = typeof(ApiClientSendContext<TBody, TResponse>);
-        foreach (var middleware in _apiClientSendMiddlewares)
-        {
-            var handleMethod = middleware.GetType().GetMethod("HandleAsync")
-                ?? throw new InvalidOperationException(
-                    "Attempt to inject ApiClientSend middleware, but injected class does not contain a HandleAsync method."
-                );
+    //     var contextMethodType = typeof(ApiClientSendContext<TBody, TResponse>);
+    //     foreach (var middleware in _apiClientSendMiddlewares)
+    //     {
+    //         var handleMethod = middleware.GetType().GetMethod("HandleAsync")
+    //             ?? throw new InvalidOperationException(
+    //                 "Attempt to inject ApiClientSend middleware, but injected class does not contain a HandleAsync method."
+    //             );
 
-            var handleMethodParams = handleMethod.GetParameters();
-            if (handleMethodParams.All(
-                param => param.ParameterType == contextMethodType
-                    && param.Name == "context"))
-            {
-                throw new InvalidOperationException(
-                    $"Attempt to inject ApiClientSend middleware, but injected class's HandleAsync method does not take a context parameter of type {contextMethodType.Name}."
-                );
-            }
+    //         var handleMethodParams = handleMethod.GetParameters();
+    //         if (handleMethodParams.All(
+    //             param => param.ParameterType == contextMethodType
+    //                 && param.Name == "context"))
+    //         {
+    //             throw new InvalidOperationException(
+    //                 $"Attempt to inject ApiClientSend middleware, but injected class's HandleAsync method does not take a context parameter of type {contextMethodType.Name}."
+    //             );
+    //         }
 
-            ParameterExpression[] parameterExpressions = [];
-            foreach (var param in handleMethodParams)
-            {
-                var newParamExpression = param.ParameterType == contextMethodType
-                    ? 
-            }
-        }
-    }
+    //         ParameterExpression[] parameterExpressions = [];
+    //         foreach (var param in handleMethodParams)
+    //         {
+    //             var contextParam = Expression.Parameter(contextMethodType, "context");
+    //             var serviceProvider = Expression.Property()
+
+    //             var newParamExpression = param.ParameterType == contextMethodType
+    //                 ? contextParam
+    //                 : Expression.Parameter(param.ParameterType, Expression.Constant(Expression.Call()))
+    //         }
+    //     }
+    // }
 
     private async Task<TResponse> ProcessSendAndCheckSuccessfulResponse<TBody, TResponse>(
         HttpMethod httpMethod,

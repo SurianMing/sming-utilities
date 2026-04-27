@@ -12,7 +12,7 @@ public class ApiClientSendContext<TBody, TResponse>(
     public string TargetUrl { get; private set; } = targetUrl;
     public TBody Body { get; } = body;
     public HeaderEntryCollection MessageHeaders { get; } = messageHeaders;
-    public IServiceProvider ServiceProvider { get; } = serviceProvider;
+    internal IServiceProvider ServiceProvider { get; } = serviceProvider;
 
     public void UpdateTargetUrl(string newTargetUrl) => TargetUrl = newTargetUrl;
 }
