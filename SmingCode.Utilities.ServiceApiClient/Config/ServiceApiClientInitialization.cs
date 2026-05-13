@@ -5,7 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 namespace SmingCode.Utilities.ServiceApiClient.Config;
 using StartupProcesses;
 
-internal class ServiceApiClientInitialization : IServiceInitializer
+internal class ServiceApiClientInitialization<TService> : IServiceInitializer
+    where TService : class
 {
     private static readonly Type _contextType = typeof(ApiClientSendContext);
     private static readonly PropertyInfo _contextServiceProviderProperty
@@ -15,7 +16,7 @@ internal class ServiceApiClientInitialization : IServiceInitializer
                 BindingFlags.NonPublic | BindingFlags.Instance
             )!;
     private static readonly MethodInfo _sendDelegateBuilder =
-        typeof(ServiceApiClientInitialization)
+        typeof(ServiceApiClientInitialization<TService>)
             .GetMethod(
                 "BuildApiClientSendDelegate",
                 BindingFlags.Static | BindingFlags.NonPublic
@@ -29,11 +30,21 @@ internal class ServiceApiClientInitialization : IServiceInitializer
                 method.Name == "GetRequiredService"
                 && method.IsGenericMethod
             );
+    private static readonly MethodInfo _getRequiredKeyedServiceMethod =
+        typeof(ServiceProviderKeyedServiceExtensions)
+            .GetMethods(
+                BindingFlags.Static | BindingFlags.Public
+            )
+            .Single(method =>
+                method.Name == "GetRequiredKeyedService"
+                && method.IsGenericMethod
+            );
 
     public Delegate ServiceInitializer =>
         (
             IServiceProvider serviceProvider,
-            MiddlewareHandler middlewareHandler,
+            MiddlewareHandler<TService> middlewareHandler,
+            ApiClientDetail<TService> _apiClientDetail,
             IEnumerable<MiddlewareDetail>? middlewareDetails
         ) =>
         {
@@ -41,12 +52,16 @@ internal class ServiceApiClientInitialization : IServiceInitializer
 
             if (middlewareDetails is not null)
             {
-                foreach (var middleware in middlewareDetails.Reverse())
+                var middlewareToInclude = middlewareDetails
+                    .Where(detail => detail.ServiceType is null || detail.ServiceType == typeof(TService))
+                    .Reverse();
+
+                foreach (var middleware in middlewareToInclude)
                 {
                     var buildApiDelegateMethod = _sendDelegateBuilder
                         !.MakeGenericMethod(middleware.MiddlewareImplementation);
 
-                    var delegateMethod = (SendDelegate)buildApiDelegateMethod.Invoke(null, [ nextPipelineEntryDelegate, serviceProvider ])!;
+                    var delegateMethod = (SendDelegate)buildApiDelegateMethod.Invoke(null, [ nextPipelineEntryDelegate, _apiClientDetail, serviceProvider ])!;
 
                     nextPipelineEntryDelegate = delegateMethod;
                 }
@@ -57,12 +72,25 @@ internal class ServiceApiClientInitialization : IServiceInitializer
 
     private static SendDelegate BuildApiClientSendDelegate<T>(
         SendDelegate nextPipelineEntryDelegate,
+        ApiClientDetail<TService> apiClientDetail,
         IServiceProvider serviceProvider
     )
     {
         var middlewareType = typeof(T);
 
-        var middlewareSingletonInstance = ActivatorUtilities.CreateInstance<T>(serviceProvider, nextPipelineEntryDelegate);
+        var constructor = typeof(T).GetConstructors(
+            BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+        ).Single();
+        var constructorParameters = constructor.GetParameters()
+            .Select(parameter => parameter.ParameterType)
+            .Select(parameterType =>
+                parameterType == typeof(SendDelegate)
+                    ? nextPipelineEntryDelegate
+                    : apiClientDetail.ClientSpecificRegisteredTypes.Contains(parameterType)
+                        ? serviceProvider.GetRequiredKeyedService(parameterType, apiClientDetail.ClientSpecificServiceKey)
+                        : serviceProvider.GetRequiredService(parameterType)
+            );
+        var middlewareSingletonInstance = (T)constructor.Invoke([ ..constructorParameters ]);
 
         Expression[] parameterBuilderExpressions = [];
         var handleAsyncMethod = middlewareType.GetMethod("HandleAsync");
@@ -88,6 +116,7 @@ internal class ServiceApiClientInitialization : IServiceInitializer
         var instanceParameter = Expression.Parameter(middlewareType, "instance");
         var contextParameter = Expression.Parameter(_contextType, "context");
         var serviceProviderProperty = Expression.Property(contextParameter, _contextServiceProviderProperty);
+        var apiClientKey = Expression.Constant(apiClientDetail.ClientSpecificServiceKey);
 
         foreach (var handleAsyncParameter in handleAsyncMethodParameters)
         {
@@ -98,7 +127,9 @@ internal class ServiceApiClientInitialization : IServiceInitializer
                 .. parameterBuilderExpressions,
                 parameterType == _contextType
                     ? contextParameter
-                    : Expression.Call(null, _getRequiredServiceMethod.MakeGenericMethod(parameterType), serviceProviderProperty)
+                    : apiClientDetail.ClientSpecificRegisteredTypes.Contains(typeof(T))
+                        ? Expression.Call(null, _getRequiredKeyedServiceMethod.MakeGenericMethod(parameterType), serviceProviderProperty, apiClientKey)
+                        : Expression.Call(null, _getRequiredServiceMethod.MakeGenericMethod(parameterType), serviceProviderProperty)
             ];
         }
         var methodCall = Expression.Call(instanceParameter, handleAsyncMethod, parameterBuilderExpressions);

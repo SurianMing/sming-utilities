@@ -31,11 +31,22 @@ internal class ApiClientMessageSender<TBody, TResponse>(
             var response = await context.HttpClient.SendAsync(requestMessageDetail.HttpRequestMessage);
             await CheckAndLogResponse(context.TargetUrl, response, serviceDisplayName);
 
-            if (typeof(TResponse) != typeof(NoResponse))
+            if (typeof(TResponse) == typeof(NoResponse))
+            {
+                context.SetResponse(
+                    new() { response.Headers },
+                    (int)response.StatusCode
+                );
+            }
+            else
             {
                 var responseBody = await response.Content.ReadFromJsonAsync<TResponse>();
 
-                context.SetResponse(responseBody);
+                context.SetResponse(
+                    new() { response.Headers },
+                    (int)response.StatusCode,
+                    responseBody!
+                );
             }
         }
         catch (ServiceApiClientException)

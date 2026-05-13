@@ -8,7 +8,7 @@ on:
         type: string
         required: true
       previous-tag:
-        description: Teh tag associated with the previous release
+        description: The tag associated with the previous release
         type: string
         required: true
 

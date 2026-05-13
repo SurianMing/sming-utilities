@@ -21,6 +21,6 @@ internal class KafkaSerializerFactory
     private class KafkaSerializer<T> : ISerializer<T>
     {
         public byte[] Serialize(T value, SerializationContext context)
-            => Encoding.UTF8.GetBytes(JsonSerializer.Serialize<T>(value));
+            => Encoding.UTF8.GetBytes(JsonSerializer.Serialize(value, JsonSerializerOptions.Web));
     }
 }

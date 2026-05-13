@@ -27,7 +27,7 @@ internal class HttpRequestMessageDetail(
                 httpRequestMessage.Content = _bodyDetail.StringContent;
             }
 
-            return httpRequestMessage;            
+            return httpRequestMessage;
         }
     }
 

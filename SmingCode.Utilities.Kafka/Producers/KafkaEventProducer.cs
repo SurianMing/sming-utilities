@@ -59,7 +59,7 @@ internal class KafkaProducer(
         Func<KafkaProducerContext, Task<bool>> produceDelegate = async (context) =>
         {
             using var producer = BuildProducer<TKey, TValue>();
-            
+
             var message = new Message<TKey, TValue>
             {
                 Value = (TValue)context.Value,
@@ -99,6 +99,7 @@ internal class KafkaProducer(
             new ProducerConfig
             {
                 BootstrapServers = _kafkaServerOptions.BootstrapServers,
+                SecurityProtocol = Enum.Parse<SecurityProtocol>(_kafkaServerOptions.SecurityProtocol),
                 ApiVersionRequest = false,
                 MessageSendMaxRetries = 3,
                 RetryBackoffMs = 1000,

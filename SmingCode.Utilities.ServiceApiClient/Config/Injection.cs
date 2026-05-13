@@ -6,50 +6,64 @@ namespace SmingCode.Utilities.ServiceApiClient.Config;
 
 public static class Configuration
 {
-    private static bool _serviceInitializerInjected = false;
     private const int DEFAULT_TIMEOUT_SECONDS = 60;
 
-    public static IServiceCollection AddApiClient<TInterface, TService>(
+    public static IServiceCollection AddApiClient<TService>(
         this IServiceCollection services,
         string targetServiceDisplayName,
         string targetServiceName
-    ) where TInterface : class
-      where TService : class, TInterface
-      => AddApiClient<TInterface, TService>(
+    ) where TService : class
+      => AddApiClient<TService>(
         services,
         targetServiceDisplayName,
         targetServiceName,
+        _ => {},
         _ => {}
       );
 
-    public static IServiceCollection AddApiClient<TInterface, TService>(
+    public static IServiceCollection AddApiClient<TService>(
         this IServiceCollection services,
         string targetServiceDisplayName,
         string targetServiceName,
         Action<HttpClient> clientConfiguration
-    ) where TInterface : class
-      where TService : class, TInterface
+    ) where TService : class
+      => AddApiClient<TService>(
+        services,
+        targetServiceDisplayName,
+        targetServiceName,
+        clientConfiguration,
+        _ => {}
+      );
+
+    public static IServiceCollection AddApiClient<TService>(
+        this IServiceCollection services,
+        string targetServiceDisplayName,
+        string targetServiceName,
+        Action<HttpClient> httpClientConfiguration,
+        Action<IServiceApiClientConfigurationBuilder<TService>> apiClientConfiguration
+    ) where TService : class
     {
-        ApiClientConfiguration<TService> apiClientConfiguration = new(
-            targetServiceDisplayName,
-            targetServiceName
-        );
-        services.AddSingleton(apiClientConfiguration);
-        services.TryAddSingleton<MiddlewareHandler>();
-        if (!_serviceInitializerInjected)
-        {
-            services.AddScoped<IServiceInitializer, ServiceApiClientInitialization>();
-            _serviceInitializerInjected = true;
-        }
+        services.AddSingleton<MiddlewareHandler<TService>>();
+        services.AddScoped<IServiceInitializer, ServiceApiClientInitialization<TService>>();
 
         services.AddHttpClient<IServiceApiClient<TService>, ApiClient<TService>>(config =>
         {
-            config.BaseAddress = new Uri($"http://{targetServiceName}");
+            config.BaseAddress = new Uri($"http://{targetServiceName}/");
             config.Timeout = TimeSpan.FromSeconds(DEFAULT_TIMEOUT_SECONDS);
-            clientConfiguration(config);
+            httpClientConfiguration(config);
         });
-        services.AddScoped<TInterface, TService>();
+        services.AddScoped<TService>();
         services.TryAddScoped(typeof(ApiClientMessageSender<,>));
+
+        var apiClientConfigurationBuilder = new ServiceApiClientConfigurationBuilder<TService>(
+            targetServiceDisplayName,
+            targetServiceName,
+            services
+        );
+        apiClientConfiguration(apiClientConfigurationBuilder);
+
+        ApiClientDetail<TService> apiClientDetail = apiClientConfigurationBuilder.BuildApiClientDetail();
+        services.AddSingleton(apiClientDetail);
 
         return services;
     }

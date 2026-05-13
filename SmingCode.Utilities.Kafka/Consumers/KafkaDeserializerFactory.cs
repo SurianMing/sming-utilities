@@ -20,7 +20,7 @@ internal class KafkaDeserializerFactory
     {
         public T Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
             => !isNull
-                ? JsonSerializer.Deserialize<T>(Encoding.UTF8.GetString(data))!
+                ? JsonSerializer.Deserialize<T>(Encoding.UTF8.GetString(data), JsonSerializerOptions.Web)!
                 : throw new InvalidCastException("Attempt to do stuff you just can't");
     }
 }

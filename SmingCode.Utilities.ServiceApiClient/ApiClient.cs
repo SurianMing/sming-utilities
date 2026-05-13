@@ -6,30 +6,22 @@ using Config;
 
 internal class ApiClient<TService>(
     HttpClient _httpClient,
-    ApiClientConfiguration<TService> _apiClientConfiguration,
-    MiddlewareHandler _middlewareHandler,
+    ApiClientDetail<TService> _apiClientDetail,
+    MiddlewareHandler<TService> _middlewareHandler,
     IServiceProvider _serviceProvider,
     ILogger<ApiClient<TService>> _logger
 ) : IServiceApiClient<TService> where TService : class
 {
-    private static ApiClientConfiguration? _clientConfiguration;
-    private ApiClientConfiguration ClientConfiguration
-        => _clientConfiguration ??= new(
-            _apiClientConfiguration.ServiceDisplayName,
-            _apiClientConfiguration.ServiceName,
-            _apiClientConfiguration.JsonSerializerOptions
-        );
-
     public HttpClient HttpClient => _httpClient;
 
-    public async Task Post(
+    public async Task<ApiClientResponse> Post(
         string relativeUrl
     ) => await Send<NoResponse>(
         HttpMethod.Post,
         relativeUrl
     );
 
-    public async Task<TResult> Post<TRequest, TResult>(
+    public async Task<ApiClientResponse<TResult>> Post<TRequest, TResult>(
         string relativeUrl,
         TRequest request,
         HeaderEntryCollection? headers = null
@@ -41,7 +33,19 @@ internal class ApiClient<TService>(
             headers
         );
 
-    public async Task<TResponse> Get<TResponse>(
+    public async Task<ApiClientResponse<TResult>> Put<TRequest, TResult>(
+        string relativeUrl,
+        TRequest request,
+        HeaderEntryCollection? headers = null
+    ) where TRequest : notnull where TResult : notnull
+        => await Send<TRequest, TResult>(
+            HttpMethod.Put,
+            relativeUrl,
+            request,
+            headers
+        );
+
+    public async Task<ApiClientResponse<TResponse>> Get<TResponse>(
         string relativeUrl
     ) where TResponse : notnull
         => await Send<TResponse>(
@@ -49,31 +53,48 @@ internal class ApiClient<TService>(
             relativeUrl
         );
 
-    private async Task Send(
+    private async Task<ApiClientResponse> Send(
         HttpMethod httpMethod,
         string relativeUrl,
         HeaderEntryCollection? messageHeaders = null
-    ) => await CallPipeline<NoBody, NoResponse>(
-        httpMethod,
-        relativeUrl,
-        new NoBody(),
-        messageHeaders
-    );
+    )
+    {
+        var resultantContext = await CallPipeline<NoBody, NoResponse>(
+            httpMethod,
+            relativeUrl,
+            new NoBody(),
+            messageHeaders
+        );
 
-    private async Task Send<TBody>(
+        return resultantContext.Response is ApiClientResponse response
+            ? response
+            : throw new InvalidCastException(
+                "Just plain failed"
+            );
+    }
+
+    private async Task<ApiClientResponse> Send<TBody>(
         HttpMethod httpMethod,
         string relativeUrl,
         TBody body,
         HeaderEntryCollection? messageHeaders = null
     ) where TBody : notnull
-        => await CallPipeline<TBody, NoResponse>(
+    {
+        var resultantContext = await CallPipeline<TBody, NoResponse>(
             httpMethod,
             relativeUrl,
             body,
             messageHeaders
         );
 
-    private async Task<TResponse> Send<TResponse>(
+        return resultantContext.Response is ApiClientResponse response
+            ? response
+            : throw new InvalidCastException(
+                "Just plain failed"
+            );
+    }
+
+    private async Task<ApiClientResponse<TResponse>> Send<TResponse>(
         HttpMethod httpMethod,
         string relativeUrl,
         HeaderEntryCollection? messageHeaders = null
@@ -86,14 +107,14 @@ internal class ApiClient<TService>(
             messageHeaders
         );
 
-        return resultantContext.Response is TResponse response
+        return resultantContext.Response is ApiClientResponse<TResponse> response
             ? response
             : throw new InvalidCastException(
                 "Just plain failed"
             );
     }
 
-    private async Task<TResponse> Send<TBody, TResponse>(
+    private async Task<ApiClientResponse<TResponse>> Send<TBody, TResponse>(
         HttpMethod httpMethod,
         string relativeUrl,
         TBody body,
@@ -107,7 +128,7 @@ internal class ApiClient<TService>(
             messageHeaders
         );
 
-        return resultantContext.Response is TResponse response
+        return resultantContext.Response is ApiClientResponse<TResponse> response
             ? response
             : throw new InvalidCastException(
                 "Just plain failed"
@@ -130,15 +151,15 @@ internal class ApiClient<TService>(
                 fullUri,
                 httpMethod,
                 Constants.UTILITY_TRACE_TYPE,
-                ClientConfiguration.ServiceDisplayName
+                _apiClientDetail.ServiceDisplayName
             );
         }
-        
+
         var messageSender = _serviceProvider.GetRequiredService<ApiClientMessageSender<TBody, TResponse>>();
 
         var context = new ApiClientSendContext(
             _httpClient,
-            ClientConfiguration,
+            _apiClientDetail,
             messageSender.HandleAsync,
             httpMethod,
             GetFullUri(relativeUrl),
@@ -156,3 +177,4 @@ internal class ApiClient<TService>(
     private string GetFullUri(string relativeUrl)
         => $"{HttpClient.BaseAddress}{relativeUrl.TrimStart('/')}";
 }
+
