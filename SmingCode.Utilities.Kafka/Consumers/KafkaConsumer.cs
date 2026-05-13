@@ -15,6 +15,7 @@ internal class KafkaConsumer<TKey, TValue>(
 ) : IKafkaConsumer
 {
     private readonly string _serviceName = serviceMetadataProvider.GetMetadata().ServiceName;
+    private readonly JsonSerializerOptions _jsonSerializerOptions = JsonSerializerOptions.Web;
 
     public void InitialiseEventConsumer(
         CancellationToken cancellationToken
@@ -65,8 +66,10 @@ internal class KafkaConsumer<TKey, TValue>(
                                 if (_logger.IsEnabled(LogLevel.Trace))
                                 {
                                     _logger.LogTrace(
-                                        "Message details are: {MessageDetails} - {TraceType}",
-                                        JsonSerializer.Serialize(cr),
+                                        "Message details are: Headers: {Headers}, Key: {Key}, Value: {Value} - {TraceType}",
+                                        cr.Message.Headers,
+                                        cr.Message.Key,
+                                        cr.Message.Value,
                                         Constants.CONSUMER_UTILITY_TRACE_TYPE
                                     );
                                 }
@@ -146,22 +149,41 @@ internal class KafkaConsumer<TKey, TValue>(
 
     private async Task<KafkaEventResult> ProcessKafkaEvent(
         string topicConsumed,
-        ConsumeResult<TKey, TValue> consumeResult
+        ConsumeResult<string, string> consumeResult
     )
     {
         using var scope = _serviceScopeFactory.CreateScope();
+        var key = typeof(TKey) == typeof(Ignore)
+            ? default
+            : JsonSerializer.Deserialize<TKey>(consumeResult.Message.Key, _jsonSerializerOptions);
+        var value = typeof(TValue) == typeof(Ignore)
+            ? default
+            : JsonSerializer.Deserialize<TValue>(consumeResult.Message.Value, _jsonSerializerOptions);
+        if (_logger.IsEnabled(LogLevel.Trace))
+        {
+            _logger.LogTrace(
+                "Strongly typed kafka message details are: Key ({KeyType}): {Key}, Value ({ValueType}): {Value} - {TraceType}",
+                typeof(TKey),
+                key,
+                typeof(TValue),
+                value,
+                Constants.CONSUMER_UTILITY_TRACE_TYPE
+            );
+        }
 
-        Func<KafkaConsumerContext, Task<KafkaEventResult>> handlerDelegate = async (kafkaConsumerContext) =>
+        async Task<KafkaEventResult> handlerDelegate(KafkaConsumerContext kafkaConsumerContext) =>
             await _kafkaConsumerDefinition.Handler.Invoke(
                 kafkaConsumerContext.ServiceProvider,
-                (ConsumeResult<TKey, TValue>)kafkaConsumerContext.ConsumeResult
+                key,
+                value
             );
 
         var context = new KafkaConsumerContext(
             topicConsumed,
-            consumeResult,
             consumeResult.Message.Headers,
+            consumeResult.Message.Key,
             typeof(TKey),
+            consumeResult.Message.Value,
             typeof(TValue),
             handlerDelegate,
             scope.ServiceProvider
@@ -183,7 +205,7 @@ internal class KafkaConsumer<TKey, TValue>(
             _ => throw new NotSupportedException($"Isolation level {_kafkaConsumerDefinition.IsolationMode} not currently supported.")
         };
 
-    private IConsumer<TKey, TValue> BuildConsumer(
+    private IConsumer<string, string> BuildConsumer(
         string topicToConsume,
         string clientGroupId
     )
@@ -203,27 +225,20 @@ internal class KafkaConsumer<TKey, TValue>(
             }
         }
 
-        var consumerBuilder = new ConsumerBuilder<TKey, TValue>(
+        var consumerBuilder = new ConsumerBuilder<string, string>(
             new ConsumerConfig
             {
                 BootstrapServers = _kafkaServerOptions.BootstrapServers,
+                SecurityProtocol = Enum.Parse<SecurityProtocol>(_kafkaServerOptions.SecurityProtocol),
                 GroupId = clientGroupId,
                 MetadataMaxAgeMs = 5000,
+                AutoOffsetReset = AutoOffsetReset.Earliest,
                 EnableAutoOffsetStore = false,
                 EnableAutoCommit = true,
                 AutoCommitIntervalMs = 100,
                 ApiVersionRequest = false
             });
 
-        if (typeof(TKey) != typeof(Ignore))
-        {
-            consumerBuilder.SetKeyDeserializer(KafkaDeserializerFactory.GetDeserializer<TKey>());
-        }
-        if (typeof(TValue) != typeof(Ignore))
-        {
-            consumerBuilder.SetValueDeserializer(KafkaDeserializerFactory.GetDeserializer<TValue>());
-        }
-        
         return consumerBuilder.Build();
     }
 

@@ -8,10 +8,14 @@
   <Project Path="SmingCode.Utilities.Kafka.Tests/SmingCode.Utilities.Kafka.Tests.csproj" />
   <Project Path="SmingCode.Utilities.Kafka/SmingCode.Utilities.Kafka.csproj" />
   <Project Path="SmingCode.Utilities.Logging.AspNetCore/SmingCode.Utilities.Logging.AspNetCore.csproj" />
+  <Project Path="SmingCode.Utilities.Logging.Worker/SmingCode.Utilities.Logging.Worker.csproj" />
   <Project Path="SmingCode.Utilities.MinimalApi/SmingCode.Utilities.MinimalApi.csproj" />
+  <Project Path="SmingCode.Utilities.Nullability.Tests/SmingCode.Utilities.Nullability.Tests.csproj" />
+  <Project Path="SmingCode.Utilities.Nullability/SmingCode.Utilities.Nullability.csproj" />
   <Project Path="SmingCode.Utilities.ProcessTracking.Kafka/SmingCode.Utilities.ProcessTracking.Kafka.csproj" />
   <Project Path="SmingCode.Utilities.ProcessTracking.WebApi/SmingCode.Utilities.ProcessTracking.WebApi.csproj" />
   <Project Path="SmingCode.Utilities.ProcessTracking/SmingCode.Utilities.ProcessTracking.csproj" />
+  <Project Path="SmingCode.Utilities.ServiceApiClient.MsalOAuth/SmingCode.Utilities.ServiceApiClient.MsalOAuth.csproj" />
   <Project Path="SmingCode.Utilities.ServiceApiClient/SmingCode.Utilities.ServiceApiClient.csproj" />
   <Project Path="SmingCode.Utilities.ServiceMetadata.WebApplicationStartup/SmingCode.Utilities.ServiceMetadata.WebApplicationStartup.csproj" />
   <Project Path="SmingCode.Utilities.ServiceMetadata/SmingCode.Utilities.ServiceMetadata.csproj" />

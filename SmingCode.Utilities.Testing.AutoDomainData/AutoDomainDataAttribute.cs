@@ -3,7 +3,7 @@
 public class AutoDomainDataAttribute : AutoDataAttribute
 {
     public AutoDomainDataAttribute()
-        : base(() => new Fixture().Customize(new SmingCustomization()))
+        : base(() => new Fixture().Customize(new SmingCodeCustomization()))
     { }
 
     public AutoDomainDataAttribute(CompositeCustomization customization)
@@ -11,7 +11,7 @@ public class AutoDomainDataAttribute : AutoDataAttribute
     { }
 
     public AutoDomainDataAttribute(Type customizationType)
-        : base(() => new Fixture().Customize(new SmingCustomization(
+        : base(() => new Fixture().Customize(new SmingCodeCustomization(
             Activator.CreateInstance(customizationType) is ICustomization instance
                 ? instance
                 : throw new NotSupportedException("Passed customization does not implement ICustomization")

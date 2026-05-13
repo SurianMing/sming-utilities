@@ -10,7 +10,7 @@ public class DelegateInvoker_1_Tests
     public async Task Test1()
     {
         // Arrange
-        var test = DelegateInvoker<IServiceProvider, string>.FromDelegate(
+        var sut = DelegateInvoker<IServiceProvider, string>.FromDelegate(
             async (
                 [FromServices] ITestClass testClass,
                 int testInt
@@ -26,7 +26,7 @@ public class DelegateInvoker_1_Tests
         var expectedResult = "Result_TestPropValue_0";
 
         // Act
-        var result = await test.Invoke(serviceProvider);
+        var result = await sut.Invoke(serviceProvider);
 
         // Assert
         result.ShouldBe(expectedResult);

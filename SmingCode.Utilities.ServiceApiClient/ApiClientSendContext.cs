@@ -4,7 +4,7 @@ public class ApiClientSendContext
 {
     internal ApiClientSendContext(
         HttpClient httpClient,
-        ApiClientConfiguration apiClientConfiguration,
+        ApiClientDetail apiClientConfiguration,
         Func<ApiClientSendContext, Task> messageSender,
         HttpMethod httpMethod,
         string targetUrl,
@@ -17,7 +17,7 @@ public class ApiClientSendContext
          = (httpClient, apiClientConfiguration, messageSender, httpMethod, targetUrl, body, bodyType, messageHeaders, serviceProvider, responseType);
 
     internal HttpClient HttpClient { get; }
-    internal ApiClientConfiguration ApiClientConfiguration { get; }
+    internal ApiClientDetail ApiClientConfiguration { get; }
     internal Func<ApiClientSendContext, Task> MessageSender { get; }
     public HttpMethod HttpMethod { get; }
     public string TargetUrl { get; private set; }
@@ -29,7 +29,11 @@ public class ApiClientSendContext
     public object? Response { get; private set; }
 
     public void UpdateTargetUrl(string newTargetUrl) => TargetUrl = newTargetUrl;
-    public void SetResponse<T>(T response)
+    public void SetResponse<T>(
+        HeaderEntryCollection headers,
+        int responseCode,
+        T response
+    )
     {
         if (typeof(T) != ResponseType)
         {
@@ -38,7 +42,21 @@ public class ApiClientSendContext
             );
         }
 
-        Response = response;
+        Response = new ApiClientResponse<T>(
+            responseCode,
+            headers,
+            response
+        );
+    }
+    public void SetResponse(
+        HeaderEntryCollection headers,
+        int responseCode
+    )
+    {
+        Response = new ApiClientResponse(
+            responseCode,
+            headers
+        );
     }
 }
 

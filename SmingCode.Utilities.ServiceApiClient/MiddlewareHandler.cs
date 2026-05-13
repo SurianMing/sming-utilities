@@ -1,6 +1,6 @@
 namespace SmingCode.Utilities.ServiceApiClient;
 
-internal class MiddlewareHandler
+internal class MiddlewareHandler<TService>
 {
     private SendDelegate _messageSender = null!;
 
