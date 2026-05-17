@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace SmingCode.Utilities.ServiceMetadata.WebApplicationStartup;
 
-public static class WebApplicationExtension
+public static class WebApplicationExtensions
 {
     public static void RunWithServiceMetadataLoggerScope(
         this WebApplication app

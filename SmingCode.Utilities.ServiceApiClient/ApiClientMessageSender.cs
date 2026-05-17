@@ -40,7 +40,9 @@ internal class ApiClientMessageSender<TBody, TResponse>(
             }
             else
             {
-                var responseBody = await response.Content.ReadFromJsonAsync<TResponse>();
+                var responseBody = await response.Content.ReadFromJsonAsync<TResponse>(
+                    context.ApiClientConfiguration.JsonSerializerOptions
+                );
 
                 context.SetResponse(
                     new() { response.Headers },

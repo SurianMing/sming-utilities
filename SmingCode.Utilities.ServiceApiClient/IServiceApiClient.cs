@@ -4,9 +4,11 @@ public interface IServiceApiClient<TService>
     where TService : class
 {
     HttpClient HttpClient { get; }
-    Task<ApiClientResponse> Post(
-        string relativeUrl
-    );
+    Task<ApiClientResponse> Post<TRequest>(
+        string relativeUrl,
+        TRequest request,
+        HeaderEntryCollection? headers = null
+    ) where TRequest : notnull;
     Task<ApiClientResponse<TResult>> Post<TRequest, TResult>(
         string relativeUrl,
         TRequest request,
