@@ -14,12 +14,17 @@ internal class ApiClient<TService>(
 {
     public HttpClient HttpClient => _httpClient;
 
-    public async Task<ApiClientResponse> Post(
-        string relativeUrl
-    ) => await Send<NoResponse>(
-        HttpMethod.Post,
-        relativeUrl
-    );
+    public async Task<ApiClientResponse> Post<TRequest>(
+        string relativeUrl,
+        TRequest request,
+        HeaderEntryCollection? headers = null
+    ) where TRequest : notnull
+        => await Send(
+            HttpMethod.Post,
+            relativeUrl,
+            request,
+            headers
+        );
 
     public async Task<ApiClientResponse<TResult>> Post<TRequest, TResult>(
         string relativeUrl,
