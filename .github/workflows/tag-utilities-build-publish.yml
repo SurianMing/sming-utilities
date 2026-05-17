@@ -21,6 +21,7 @@ jobs:
           - SmingCode.Utilities.Data
           - SmingCode.Utilities.DelegateInvokers
           - SmingCode.Utilities.Logging.AspNetCore
+          - SmingCode.Utilities.Logging.Worker
           - SmingCode.Utilities.MinimalApi
           - SmingCode.Utilities.Nullability
           - SmingCode.Utilities.ProcessTracking
