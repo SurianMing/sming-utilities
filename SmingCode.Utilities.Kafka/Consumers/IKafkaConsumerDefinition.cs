@@ -7,4 +7,5 @@ public interface IKafkaConsumerDefinition
     );
     IKafkaConsumerDefinition UseRegexPatternMatchingForTopic();
     IKafkaConsumerDefinition CreateTopicIfNotExists();
+    ICustomPropertyHandler CustomPropertyHandler { get; }
 }

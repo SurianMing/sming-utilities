@@ -5,6 +5,7 @@ internal class KafkaConsumerDefinition<TKey, TValue>(
     Delegate handler
 ) : IKafkaConsumerDefinition
 {
+    private readonly CustomPropertyHandler _customPropertyHandler = new();
     internal KafkaDelegateInvoker<TKey, TValue> Handler { get; } = new(handler);
     internal IsolationMode IsolationMode { get; private set; } = IsolationMode.PerServiceType;
     internal bool UseRegexPatternMatching { get; private set; }
@@ -34,4 +35,6 @@ internal class KafkaConsumerDefinition<TKey, TValue>(
 
         return this;
     }
+
+    public ICustomPropertyHandler CustomPropertyHandler => _customPropertyHandler;
 }

@@ -9,10 +9,11 @@ public class KafkaConsumerContext
         Type keyType,
         object? value,
         Type valueType,
+        ICustomPropertyHandler customPropertyHandler,
         Func<KafkaConsumerContext, Task<KafkaEventResult>> messageConsumer,
         IServiceProvider serviceProvider
-    ) => (TopicConsumed, Headers, Key, KeyType, Value, ValueType, MessageConsumer, ServiceProvider)
-            = (topicConsumed, headers, key, keyType, value, valueType, messageConsumer, serviceProvider);
+    ) => (TopicConsumed, Headers, Key, KeyType, Value, ValueType, CustomPropertyHandler, MessageConsumer, ServiceProvider)
+            = (topicConsumed, headers, key, keyType, value, valueType, customPropertyHandler, messageConsumer, serviceProvider);
 
     internal IServiceProvider ServiceProvider { get; }
     internal Func<KafkaConsumerContext, Task<KafkaEventResult>> MessageConsumer { get; }
@@ -23,4 +24,5 @@ public class KafkaConsumerContext
     public Type KeyType { get; }
     public object? Value { get; }
     public Type ValueType { get; }
+    public ICustomPropertyHandler CustomPropertyHandler { get; }
 }

@@ -55,7 +55,6 @@ internal class KafkaConsumer<TKey, TValue>(
 
                         if (cr is not null && cr.Topic != "__consumer_offsets")
                         {
-                            var trackingId = Guid.NewGuid();
                             if (_logger.IsEnabled(LogLevel.Information))
                             {
                                 _logger.LogInformation(
@@ -185,6 +184,7 @@ internal class KafkaConsumer<TKey, TValue>(
             typeof(TKey),
             consumeResult.Message.Value,
             typeof(TValue),
+            _kafkaConsumerDefinition.CustomPropertyHandler,
             handlerDelegate,
             scope.ServiceProvider
         );
