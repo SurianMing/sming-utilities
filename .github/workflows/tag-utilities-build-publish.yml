@@ -24,7 +24,6 @@ jobs:
           - SmingCode.Utilities.Logging.Worker
           - SmingCode.Utilities.MinimalApi
           - SmingCode.Utilities.Nullability
-          - SmingCode.Utilities.ProcessTracking
           - SmingCode.Utilities.ServiceMetadata
           - SmingCode.Utilities.StartupProcesses
           - SmingCode.Utilities.Testing.AutoDomainData
@@ -39,6 +38,7 @@ jobs:
       fail-fast: true
       matrix:
         utility-project-name:
+          - SmingCode.Utilities.ProcessTracking
           - SmingCode.Utilities.ServiceApiClient
           - SmingCode.Utilities.ServiceMetadata.WebApplicationStartup
           - SmingCode.Utilities.StartupProcesses.AspNetCore
