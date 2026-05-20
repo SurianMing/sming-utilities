@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SmingCode.Utilities.ProcessTracking;
+namespace SmingCode.Utilities.ProcessTracking.Config;
 
 public static class Injection
 {

@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace SmingCode.Utilities.ProcessTracking.WebApi;
+
+using System.Net;
 using Config;
 using ServiceMetadata;
 
@@ -42,7 +45,26 @@ internal class WebApiIngressMiddleware(
             out var processTrackingDetail
         ))
         {
-            throw new Exception();
+            var endpointTags = httpContext.GetEndpoint()
+                ?.Metadata
+                .OfType<TagsAttribute>()
+                .SelectMany(tagAttr => tagAttr.Tags)
+                .ToList() ?? [];
+
+            var processName = endpointTags
+                .FirstOrDefault(
+                    tag => tag.StartsWith(Constants.PROCESS_NAME_ENDPOINT_TAG, StringComparison.InvariantCultureIgnoreCase)
+                )
+                ?[Constants.PROCESS_NAME_ENDPOINT_TAG.Length..];
+
+            if (string.IsNullOrEmpty(processName))
+            {
+                httpContext.Response.Clear();
+                httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return;
+            }
+
+            processTrackingHandler.InitialiseNewProcess(processName);
         }
 
         using var scope = _logger.BeginScope(
@@ -51,19 +73,6 @@ internal class WebApiIngressMiddleware(
         );
 
         var currentProcessTags = processTrackingHandler.ProcessTags;
-        if (_logger.IsEnabled(LogLevel.Trace))
-        {
-            _logger.LogTrace(
-                "Process tags loaded from incoming headers: {ProcessTags} - {TraceType}",
-                string.Join(
-                    ",",
-                    currentProcessTags.Select(header =>
-                        $"{header.Key}:{header.Value}"
-                    )
-                ),
-                Constants.UTILITY_TRACE_TYPE
-            );
-        }
 
         await _next(httpContext);
     }

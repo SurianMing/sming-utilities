@@ -4,24 +4,84 @@ using Microsoft.Extensions.Logging;
 
 namespace SmingCode.Utilities.ProcessTracking.Kafka;
 using Config;
+using Confluent.Kafka;
 using ServiceMetadata;
+using SmingCode.Utilities.Kafka;
 using Utilities.Kafka.Consumers;
 
 internal class ProcessTrackingConsumerMiddleware(
     ConsumeDelegate consumeDelegate,
-    IServiceMetadataProvider serviceMetadataProvider,
+    IServiceMetadataProvider? serviceMetadataProvider,
     ILogger<ProcessTrackingConsumerMiddleware> _logger
 )
 {
     private readonly Dictionary<string, object> _serviceMetadataCustomDimensions
-        = serviceMetadataProvider.GetMetadata().GetCustomDimensions();
+        = serviceMetadataProvider?.GetMetadata().GetCustomDimensions() ?? [];
 
     public async Task<KafkaEventResult> HandleAsync(
         KafkaConsumerContext context,
         IProcessTrackingHandler processTrackingHandler
     )
     {
-        var messageHeaders = context.Headers
+        var processTrackingHandlerConfigured =
+            context.CustomPropertyHandler.TryGetCustomProperty<bool>(
+                Constants.INITIALISES_PROCESS_CUSTOM_PROPERTY_NAME,
+                out var initialisesProcess
+            ) && initialisesProcess
+                ? TryInitialiseNewProcess(
+                    processTrackingHandler,
+                    context.CustomPropertyHandler
+                )
+                : TryLoadProcessDetailFromIncomingTags(
+                    context.Headers,
+                    processTrackingHandler
+                );
+
+        if (!processTrackingHandlerConfigured)
+        {
+            return KafkaEventResult.Incomplete;
+        }
+
+        using var scope = _logger.BeginScope(
+            processTrackingHandler.StructuredLoggingMetadata
+                .Concat(_serviceMetadataCustomDimensions)
+        );
+
+        return await consumeDelegate(
+            context
+        );
+    }
+
+    private bool TryInitialiseNewProcess(
+        IProcessTrackingHandler processTrackingHandler,
+        ICustomPropertyHandler customPropertyHandler
+    )
+    {
+        if (!customPropertyHandler.TryGetCustomProperty<string>(
+            Constants.PROCESS_NAME_CUSTOM_PROPERTY_NAME,
+            out var processName
+        ) || string.IsNullOrEmpty(processName))
+        {
+            _logger.LogError(
+                "Attempt to initialise no process, but no process name could be found."
+            );
+
+            return false;
+        }
+
+        processTrackingHandler.InitialiseNewProcess(
+            processName
+        );
+
+        return true;
+    }
+
+    private bool TryLoadProcessDetailFromIncomingTags(
+        Headers incomingHeaders,
+        IProcessTrackingHandler processTrackingHandler
+    )
+    {
+        var messageHeaders = incomingHeaders
             .ToDictionary(
                 header => header.Key,
                 header => Encoding.UTF8.GetString(header.GetValueBytes())
@@ -46,28 +106,13 @@ internal class ProcessTrackingConsumerMiddleware(
         {
             _logger.LogError(
                 "Unable to load process tracking headers. Incoming headers were {IncomingHeaders} - {TraceType}",
-                JsonSerializer.Serialize(context.Headers),
+                JsonSerializer.Serialize(incomingHeaders),
                 Constants.CONSUMER_MIDDLEWARE_UTILITY_TRACE_TYPE
             );
 
-            return KafkaEventResult.Incomplete;
+            return false;
         }
 
-        using var scope = _logger.BeginScope(
-            processTrackingHandler.StructuredLoggingMetadata
-                .Concat(_serviceMetadataCustomDimensions)
-        );
-
-        if (_logger.IsEnabled(LogLevel.Information))
-        {
-            _logger.LogInformation(
-                "Process tracking details loaded from incoming message headers - {TraceType}",
-                Constants.CONSUMER_MIDDLEWARE_UTILITY_TRACE_TYPE
-            );
-        }
-
-        return await consumeDelegate(
-            context
-        );
+        return true;
     }
 }
